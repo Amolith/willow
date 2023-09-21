@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+    <head>
+        <title>Willow</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="title" content="Willow">
+        <meta name="description" content="Willow">
+        <style>
+html {
+  max-width: 500px;
+  margin: auto auto;
+}
+        </style>
+    </head>
+    <body>
+        <h1>Willow</h1>
+        <form method="post">
+            <div class="input">
+                <label for="url">Project URL:</label>
+                <input type="text" id="url" name="url">
+            </div>
+            <div class="input">
+                <label for="name">Project name:</label>
+                <input type="text" id="name" name="name">
+            </div>
+            <div class="input">
+                <h3>Forge type:</h3>
+                <p>RSS</p>
+                <input type="radio" id="github" name="forge" value="github">
+                <label for="github">Github</label><br>
+                <input type="radio" id="gitea" name="forge" value="gitea">
+                <label for="gitea">Gitea</label><br>
+                <input type="radio" id="Forgejo" name="forge" value="Forgejo">
+                <label for="Forgejo">Forgejo</label><br>
+                <p>Raw git</p>
+                <input type="radio" id="gitlab" name="forge" value="gitlab">
+                <label for="gitlab">GitLab</label><br>
+                <input type="radio" id="sourcehut" name="forge" value="sourcehut">
+                <label for="sourcehut">Sourcehut</label><br>
+                <input type="radio" id="bitbucket" name="forge" value="bitbucket">
+                <label for="bitbucket">Bitbucket</label><br>
+                <input type="radio" id="other" name="forge" value="other">
+                <label for="other">Other</label>
+            </div>
+            <input class="button" type="submit" formaction="/new" value="Next">
+        </form>
+    </body>
+</html>

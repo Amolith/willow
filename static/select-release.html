@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+    <head>
+        <title>Willow</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="title" content="Willow">
+        <meta name="description" content="Willow">
+        <style>
+html {
+  max-width: 500px;
+  margin: auto auto;
+}
+        </style>
+    </head>
+    <body>
+        <h1>Willow</h1>
+        <form method="post">
+            <div class="input">
+                <p>Which release of {{ .Name }} are you currently running?</p>
+                {{- $url := .URL -}}
+                {{- $forge := .Forge -}}
+                {{- range .Releases -}}
+                <input type="radio" id="{{ .Tag }}" name="release" value="{{ .Tag }}">
+                {{- if ne .URL "" -}}
+                <label for="{{ .Tag }}"><a href="{{ .URL }}">{{ .Tag }}</a></label><br>
+                {{- else -}}
+                {{- if eq $forge "sourcehut" -}}
+                <label for="{{ .Tag }}"><a href="{{ $url }}/refs/{{ .Tag }}">{{ .Tag }}</label><br>
+                {{- else if eq $forge "gitlab" -}}
+                <label for="{{ .Tag }}"><a href="{{ $url }}/-releases/{{ .Tag }}">{{ .Tag }}</label><br>
+                {{- else -}}
+                <label for="{{ .Tag }}">{{ .Tag }}</label><br>
+                {{- end -}}
+                {{- end -}}
+                {{- end -}}
+            </div>
+            <input type="hidden" name="url" value="{{ .URL }}">
+            <input type="hidden" name="name" value="{{ .Name }}">
+            <input type="hidden" name="forge" value="{{ .Forge }}">
+            <input class="button" type="submit" formaction="/new" value="Track future releases">
+        </form>
+    </body>
+</html>

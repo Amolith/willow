@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+    <head>
+        <title>Willow</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="title" content="Willow">
+        <meta name="description" content="Willow">
+        <style>
+html {
+  max-width: 500px;
+  margin: auto auto;
+}
+.project {
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #f8f8f8;
+}
+.project > h2 {
+  margin: 16px 0 0 0;
+}
+.project > h2 > span {
+  float: right;
+}
+    </style>
+    </head>
+    <body>
+        <h1>Willow</h1>
+        <p><a href="/new">Track a new project</a></p>
+        {{- range . -}}
+        <div class="project">
+            <h2><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span style="font-size: 12px;"><a href="/new?action=delete&url={{ .URL }}">Delete?</a></span></h2>
+            <p>Currently running {{ .Running }}.</p>
+            {{- if ne .Running (index .Releases 0).Tag -}}
+                <p>New release available: <a href="{{ (index .Releases 0).URL }}">{{ (index .Releases 0).Tag }}</a>. <a href="/new?action=update&url={{ .URL }}&forge={{ .Forge }}&name={{ .Name }}">Update?</a></p>
+                <p>
+                    <details>
+                        <summary>Expand release notes</summary>
+                        {{- if eq .Forge "github" "gitea" "forgejo" -}}
+                            {{- (index .Releases 0).Content -}}
+                        {{- else -}}
+                            <pre>
+                            {{- (index .Releases 0).Content -}}
+                            </pre>
+                        {{- end -}}
+                    </details>
+                </p>
+            {{- end -}}
+        </div>
+        {{- end -}}
+    </body>
+</html>
