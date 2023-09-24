@@ -10,12 +10,12 @@ SPDX-License-Identifier: CC0-1.0
 [![REUSE status][reuse-shield]][reuse]
 [![Donate with fosspay][fosspay-shield]][fosspay]
 
-_Software release tracker supporting arbitrary forges_
+_Forge-agnostic software release tracker_
 
 ![screenshot of willow's current web UI](screenshots/2023-09-24.png)
 
 _This UI is a minimal proof-of-concept, it's going to change drastically in the
-near future_
+near future._
 
 ## What is it?
 
