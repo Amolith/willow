@@ -12,6 +12,11 @@ SPDX-License-Identifier: CC0-1.0
 
 _Software release tracker supporting arbitrary forges_
 
+![screenshot of willow's current web UI](screenshots/2023-09-24.png)
+
+_This UI is a minimal proof-of-concept, it's going to change drastically in the
+near future_
+
 ## What is it?
 
 Willow tracks software releases across arbitrary forge platforms by trying to
