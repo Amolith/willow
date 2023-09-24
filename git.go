@@ -16,11 +16,11 @@ import (
 )
 
 // listRemoteTags lists all tags in a remote repository, whether HTTP(S) or SSH.
-func listRemoteTags(url string) (tags []string, err error) {
-	// TODO: Implement listRemoteTags
-	// https://pkg.go.dev/github.com/go-git/go-git/v5@v5.8.0#NewRemote
-	return nil, nil
-}
+// func listRemoteTags(url string) (tags []string, err error) {
+// 	// TODO: Implement listRemoteTags
+// 	// https://pkg.go.dev/github.com/go-git/go-git/v5@v5.8.0#NewRemote
+// 	return nil, nil
+// }
 
 // fetchReleases fetches all releases in a remote repository, whether HTTP(S) or SSH.
 func getGitReleases(p project) (project, error) {
