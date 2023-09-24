@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Amolith <amolith@secluded.site>
+//
+// SPDX-License-Identifier: CC0-1.0
+
 module git.sr.ht/~amolith/willow
 
 go 1.20
