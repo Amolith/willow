@@ -39,22 +39,31 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 			url := bmStrict.Sanitize(params.Get("url"))
 			if url == "" {
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte("No URL provided"))
+				_, err := w.Write([]byte("No URL provided"))
+				if err != nil {
+					fmt.Println(err)
+				}
 				return
 			}
 
 			forge := bmStrict.Sanitize(params.Get("forge"))
 			if forge == "" {
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte("No forge provided"))
+				_, err := w.Write([]byte("No forge provided"))
+				if err != nil {
+					fmt.Println(err)
+				}
 				return
 			}
 
 			name := bmStrict.Sanitize(params.Get("name"))
 			if name == "" {
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte("No name provided"))
-				return
+				_, err := w.Write([]byte("No name provided"))
+				if err != nil {
+					fmt.Println(err)
+
+				}
 			}
 
 			proj := project{
@@ -65,8 +74,11 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 			proj, err := getReleases(proj)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(fmt.Sprintf("Error getting releases: %s", err)))
-				return
+				_, err := w.Write([]byte(fmt.Sprintf("Error getting releases: %s", err)))
+				if err != nil {
+					fmt.Println(err)
+
+				}
 			}
 			tmpl := template.Must(template.ParseFS(fs, "static/select-release.html"))
 			if err := tmpl.Execute(w, proj); err != nil {
@@ -76,8 +88,11 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 			url := params.Get("url")
 			if url == "" {
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte("No URL provided"))
-				return
+				_, err := w.Write([]byte("No URL provided"))
+				if err != nil {
+					fmt.Println(err)
+
+				}
 			}
 
 			untrack(url)
@@ -86,7 +101,10 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		r.ParseForm()
+		err := r.ParseForm()
+		if err != nil {
+			fmt.Println(err)
+		}
 		nameValue := bmStrict.Sanitize(r.FormValue("name"))
 		urlValue := bmStrict.Sanitize(r.FormValue("url"))
 		forgeValue := bmStrict.Sanitize(r.FormValue("forge"))
@@ -105,8 +123,11 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 
 		if nameValue == "" && urlValue == "" && forgeValue == "" && releaseValue == "" {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("No data provided"))
-			return
+			_, err := w.Write([]byte("No data provided"))
+			if err != nil {
+				fmt.Println(err)
+
+			}
 		}
 	}
 }
