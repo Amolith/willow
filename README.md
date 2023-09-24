@@ -56,28 +56,61 @@ Note that there's currently no authentication, so consider putting your instance
 behind HTTP Basic Auth, keeping it private, or helping me implement
 authentication.
 
-## Questions & Contributions
+## Contributing
 
-Questions, comments, and patches can always be sent to my public inbox, but I'm
-also in my IRC channel/XMPP room pretty much 24/7. However, I might not see
-messages right away because I'm working on something else (or sleeping) so
-please stick around!
+Contributions are very much welcome! Please take a look at the [ticket
+tracker][todo] and see if there's anything you're interested in working on. If
+there's specific functionality you'd like to see implemented and it's not
+mentioned in the ticket tracker, please post to the [mailing list][email] and
+describe the feature.
+
+Questions, comments, and patches can always be sent to the [mailing
+list][email], but I'm also in the [IRC channel][irc]/[XMPP room][xmpp] pretty
+much 24/7. However, I might not see messages right away because I'm working on
+something else (or sleeping) so please stick around.
 
 If you're wanting to introduce a new feature and I don't feel like it fits with
 this project's goal, I encourage you to fork the repo and make whatever changes
 you like!
 
-- Email: [~amolith/public-inbox@lists.sr.ht][email]
-- IRC: [irc.nixnet.services/#secluded][irc]
-- XMPP: [secluded@muc.secluded.site][xmpp]
+- Email: [~amolith/willow@lists.sr.ht][email]
+- IRC: [irc.libera.chat/#willow][irc]
+- XMPP: [willow@muc.secluded.site][xmpp]
+
+[email]: mailto:~amolith/willow@lists.sr.ht
+[irc]: irc://irc.nixnet.services/#willow
+[xmpp]: xmpp:willow@muc.secluded.site?join
+[todo]: https://todo.sr.ht/~amolith/willow
 
 _If you haven't used mailing lists before, please take a look at [SourceHut's
 documentation](https://man.sr.ht/lists.sr.ht/), especially the etiquette
 section._
 
-[email]: mailto:~amolith/public-inbox@lists.sr.ht
-[irc]: irc://irc.nixnet.services/#secluded
-[xmpp]: xmpp:secluded@muc.secluded.site?join
+### Required tools
+
+- [Go](https://go.dev/)
+- [gofumpt](https://github.com/mvdan/gofumpt)
+  - Stricter formatting rules than the default `go fmt`
+- [golangci-lint](https://golangci-lint.run/)
+  - Aggregates various preinstalled Go linters, runs them in parallel, and makes
+    heavy use of the Go build cache
+- [Staticcheck](https://staticcheck.dev/)
+  - Uses static analysis to find bugs and performance issues, offer
+    simplifications, and enforce style rules
+
+### Suggested tools
+
+- [just](https://github.com/casey/just)
+  - Command runner to simplify use of the required tools
+
+### Configuring git for git send-email
+
+First, go through the tutorial on
+[git-send-email.io](https://git-send-email.io/).
+
+``` shell
+git config sendemail.to "~amolith/willow@lists.sr.ht"
+```
 
 [goreportcard-badge]: https://goreportcard.com/badge/git.sr.ht/~amolith/willow
 [goreportcard]: https://goreportcard.com/report/git.sr.ht/~amolith/willow
