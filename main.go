@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -92,7 +93,7 @@ func main() {
 	mux.HandleFunc("/static", staticHandler)
 	mux.HandleFunc("/new", newHandler)
 
-	if err := httpServer.ListenAndServe(); err == http.ErrServerClosed {
+	if err := httpServer.ListenAndServe(); errors.Is(err, http.ErrServerClosed) {
 		log.Println("Web server closed")
 	} else {
 		log.Fatalln(err)
