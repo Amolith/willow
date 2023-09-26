@@ -36,8 +36,8 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err)
 			}
 		} else if action != "delete" {
-			url := bmStrict.Sanitize(params.Get("url"))
-			if url == "" {
+			submittedURL := bmStrict.Sanitize(params.Get("submittedURL"))
+			if submittedURL == "" {
 				w.WriteHeader(http.StatusBadRequest)
 				_, err := w.Write([]byte("No URL provided"))
 				if err != nil {
@@ -67,7 +67,7 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			proj := project{
-				URL:   url,
+				URL:   submittedURL,
 				Name:  name,
 				Forge: forge,
 			}
@@ -85,8 +85,8 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err)
 			}
 		} else if action == "delete" {
-			url := params.Get("url")
-			if url == "" {
+			submittedURL := params.Get("submittedURL")
+			if submittedURL == "" {
 				w.WriteHeader(http.StatusBadRequest)
 				_, err := w.Write([]byte("No URL provided"))
 				if err != nil {
@@ -95,7 +95,7 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
-			untrack(url)
+			untrack(submittedURL)
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 		}
 	}
