@@ -53,7 +53,20 @@ var (
 func main() {
 	file, err := os.Open("projects.csv")
 	if err != nil {
-		log.Fatalln(err)
+		if os.IsNotExist(err) {
+			file, err = os.Create("projects.csv")
+			if err != nil {
+				log.Fatalln(err)
+			}
+			defer file.Close()
+
+			_, err = file.WriteString("url,name,forge,running\nhttps://git.sr.ht/~amolith/earl,earl,sourcehut,v0.0.1-rc0\n")
+			if err != nil {
+				log.Fatalln(err)
+			}
+		} else {
+			log.Fatalln(err)
+		}
 	}
 	defer file.Close()
 
