@@ -103,7 +103,7 @@ func main() {
 func refreshLoop(manualRefresh, req chan struct{}, res chan []project) {
 	ticker := time.NewTicker(time.Second * 3600)
 
-	yoink := func() []project {
+	fetch := func() []project {
 		projects := make([]project, len(m.Projects))
 		copy(projects, m.Projects)
 		for i, project := range projects {
@@ -118,15 +118,15 @@ func refreshLoop(manualRefresh, req chan struct{}, res chan []project) {
 		return projects
 	}
 
-	projects := yoink()
+	projects := fetch()
 
 	for {
 		select {
 		case <-ticker.C:
-			projects = yoink()
+			projects = fetch()
 		case <-manualRefresh:
 			ticker.Reset(time.Second * 3600)
-			projects = yoink()
+			projects = fetch()
 		case <-req:
 			projectsCopy := make([]project, len(projects))
 			copy(projectsCopy, projects)
