@@ -7,8 +7,11 @@ module git.sr.ht/~amolith/willow
 go 1.20
 
 require (
+	github.com/BurntSushi/toml v1.3.2
 	github.com/go-git/go-git/v5 v5.8.0
+	github.com/microcosm-cc/bluemonday v1.0.25
 	github.com/mmcdole/gofeed v1.2.1
+	github.com/spf13/pflag v1.0.5
 )
 
 require (
@@ -28,7 +31,6 @@ require (
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.25 // indirect
 	github.com/mmcdole/goxpp v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect

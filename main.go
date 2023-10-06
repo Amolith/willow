@@ -8,6 +8,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"github.com/BurntSushi/toml"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ import (
 	"time"
 
 	"github.com/microcosm-cc/bluemonday"
+	flag "github.com/spf13/pflag"
 )
 
 type (
@@ -37,9 +39,23 @@ type (
 		URL     string
 		Date    time.Time
 	}
+
+	Config struct {
+		Server      server
+		CSVLocation string
+		// TODO: Make cache location configurable
+		// CacheLocation string
+		FetchInterval int
+	}
+
+	server struct {
+		Listen string
+	}
 )
 
 var (
+	flagConfig    *string = flag.StringP("config", "c", "config.toml", "Path to config file")
+	config        Config
 	req           = make(chan struct{})
 	manualRefresh = make(chan struct{})
 	res           = make(chan []project)
@@ -51,26 +67,20 @@ var (
 )
 
 func main() {
-	file, err := os.Open("projects.csv")
+
+	flag.Parse()
+
+	err := checkConfig()
 	if err != nil {
-		if os.IsNotExist(err) {
-			file, err = os.Create("projects.csv")
-			if err != nil {
-				log.Fatalln(err)
-			}
-			defer file.Close()
-
-			_, err = file.WriteString("url,name,forge,running\nhttps://git.sr.ht/~amolith/earl,earl,sourcehut,v0.0.1-rc0\n")
-			if err != nil {
-				log.Fatalln(err)
-			}
-		} else {
-			log.Fatalln(err)
-		}
+		log.Fatalln(err)
 	}
-	defer file.Close()
 
-	reader := csv.NewReader(file)
+	err = checkCSV()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	reader := csv.NewReader(strings.NewReader(config.CSVLocation))
 
 	records, err := reader.ReadAll()
 	if err != nil {
@@ -98,7 +108,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	httpServer := &http.Server{
-		Addr:    "0.0.0.0:1337",
+		Addr:    config.Server.Listen,
 		Handler: mux,
 	}
 
@@ -146,4 +156,73 @@ func refreshLoop(manualRefresh, req chan struct{}, res chan []project) {
 			res <- projectsCopy
 		}
 	}
+}
+
+func checkConfig() error {
+	file, err := os.Open(*flagConfig)
+	if err != nil {
+		if os.IsNotExist(err) {
+			file, err = os.Create(*flagConfig)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
+			_, err = file.WriteString("# Location of the CSV file containing the projects\nCSVLocation = \"projects.csv\"\n# How often to fetch new releases in seconds\nFetchInterval = 3600\n\n[Server]\n# Address to listen on\nListen = \"127.0.0.1:1313\"\n")
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("Config file created at", *flagConfig)
+			fmt.Println("Please edit it and restart the server")
+			os.Exit(0)
+		} else {
+			return err
+		}
+	}
+	defer file.Close()
+
+	_, err = toml.DecodeFile(*flagConfig, &config)
+	if err != nil {
+		return err
+	}
+
+	if config.CSVLocation == "" {
+		fmt.Println("No CSV location specified, using projects.csv")
+		config.CSVLocation = "projects.csv"
+	}
+
+	if config.FetchInterval < 10 {
+		fmt.Println("Fetch interval is set to", config.FetchInterval, "seconds, but the minimum is 10, using 10")
+		config.FetchInterval = 10
+	}
+
+	if config.Server.Listen == "" {
+		fmt.Println("No listen address specified, using 127.0.0.1:1313")
+		config.Server.Listen = "127.0.0.1:1313"
+	}
+
+	return nil
+}
+
+func checkCSV() error {
+	file, err := os.Open(config.CSVLocation)
+	if err != nil {
+		if os.IsNotExist(err) {
+			file, err = os.Create(config.CSVLocation)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
+			_, err = file.WriteString("url,name,forge,running\nhttps://git.sr.ht/~amolith/earl,earl,sourcehut,v0.0.1-rc0\n")
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+	defer file.Close()
+	return nil
 }

@@ -64,7 +64,7 @@ func untrack(url string) {
 }
 
 func writeCSV() {
-	file, err := os.OpenFile("projects.csv", os.O_RDWR|os.O_CREATE, 0o600)
+	file, err := os.OpenFile(config.CSVLocation, os.O_RDWR|os.O_CREATE, 0o600)
 	if err != nil {
 		log.Fatalln(err)
 	}
