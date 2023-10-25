@@ -2,24 +2,41 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package main
+package rss
 
 import (
 	"fmt"
+	"time"
+
+	"github.com/microcosm-cc/bluemonday"
 
 	"github.com/mmcdole/gofeed"
 )
 
-func getRSSReleases(p project) (project, error) {
+type Release struct {
+	Tag     string
+	Content string
+	URL     string
+	Date    time.Time
+}
+
+var (
+	bmUGC    = bluemonday.UGCPolicy()
+	bmStrict = bluemonday.StrictPolicy()
+)
+
+func GetReleases(feedURL string) ([]Release, error) {
 	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(p.URL + "/releases.atom")
+	feed, err := fp.ParseURL(feedURL + "/releases.atom")
 	if err != nil {
 		fmt.Println(err)
-		return p, err
+		return nil, err
 	}
 
+	releases := make([]Release, 0)
+
 	for _, item := range feed.Items {
-		p.Releases = append(p.Releases, release{
+		releases = append(releases, Release{
 			Tag:     bmStrict.Sanitize(item.Title),
 			Content: bmUGC.Sanitize(item.Content),
 			URL:     bmStrict.Sanitize(item.Link),
@@ -30,5 +47,5 @@ func getRSSReleases(p project) (project, error) {
 	// TODO: Doesn't seem to work?
 	// sort.Slice(p.Releases, func(i, j int) bool { return p.Releases[i].Date.After(p.Releases[j].Date) })
 
-	return p, nil
+	return releases, nil
 }

@@ -2,17 +2,34 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package main
+package git
 
 import (
 	"errors"
+	"fmt"
+	"net/url"
 	"os"
 	"sort"
 	"strings"
+	"time"
+
+	"github.com/microcosm-cc/bluemonday"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport"
+)
+
+type Release struct {
+	Tag     string
+	Content string
+	URL     string
+	Date    time.Time
+}
+
+var (
+	bmUGC    = bluemonday.UGCPolicy()
+	bmStrict = bluemonday.StrictPolicy()
 )
 
 // listRemoteTags lists all tags in a remote repository, whether HTTP(S) or SSH.
@@ -22,37 +39,51 @@ import (
 // 	return nil, nil
 // }
 
-// fetchReleases fetches all releases in a remote repository, whether HTTP(S) or SSH.
-func getGitReleases(p project) (project, error) {
-	r, err := minimalClone(p.URL)
+// GetReleases fetches all releases in a remote repository, whether HTTP(S) or
+// SSH.
+func GetReleases(gitURI, forge string) ([]Release, error) {
+	r, err := minimalClone(gitURI)
 	if err != nil {
-		return p, err
+		return nil, err
 	}
 	tagRefs, err := r.Tags()
 	if err != nil {
-		return p, err
+		return nil, err
 	}
+
+	parsedURI, err := url.Parse(gitURI)
+	if err != nil {
+		fmt.Println("Error parsing URI: " + err.Error())
+	}
+
+	var httpURI string
+	if parsedURI.Scheme != "" {
+		httpURI = parsedURI.Host + parsedURI.Path
+	}
+
+	releases := make([]Release, 0)
+
 	err = tagRefs.ForEach(func(tagRef *plumbing.Reference) error {
 		obj, err := r.TagObject(tagRef.Hash())
-		switch err {
-		case plumbing.ErrObjectNotFound:
+		switch {
+		case errors.Is(err, plumbing.ErrObjectNotFound):
 			// This is a lightweight tag, not an annotated tag, skip it
 			return nil
-		case nil:
-			url := ""
+		case err == nil:
+			tagURL := ""
 			tagName := bmStrict.Sanitize(tagRef.Name().Short())
-			switch p.Forge {
+			switch forge {
 			case "sourcehut":
-				url = p.URL + "/refs/" + tagName
+				tagURL = "https://" + httpURI + "/refs/" + tagName
 			case "gitlab":
-				url = p.URL + "/-/releases/" + tagName
+				tagURL = "https://" + httpURI + "/-/releases/" + tagName
 			default:
-				url = ""
+				tagURL = ""
 			}
-			p.Releases = append(p.Releases, release{
+			releases = append(releases, Release{
 				Tag:     tagName,
 				Content: bmUGC.Sanitize(obj.Message),
-				URL:     url,
+				URL:     tagURL,
 				Date:    obj.Tagger.When,
 			})
 		default:
@@ -61,12 +92,12 @@ func getGitReleases(p project) (project, error) {
 		return nil
 	})
 	if err != nil {
-		return p, err
+		return nil, err
 	}
 
-	sort.Slice(p.Releases, func(i, j int) bool { return p.Releases[i].Date.After(p.Releases[j].Date) })
+	sort.Slice(releases, func(i, j int) bool { return releases[i].Date.After(releases[j].Date) })
 
-	return p, nil
+	return releases, nil
 }
 
 // minimalClone clones a repository with a depth of 1 and no checkout.
@@ -86,7 +117,7 @@ func minimalClone(url string) (r *git.Repository, err error) {
 			Depth:      1,
 			Tags:       git.AllTags,
 		})
-		if err == git.NoErrAlreadyUpToDate {
+		if errors.Is(err, git.NoErrAlreadyUpToDate) {
 			return r, nil
 		}
 		return r, err
@@ -101,8 +132,8 @@ func minimalClone(url string) (r *git.Repository, err error) {
 	return r, err
 }
 
-// removeRepo removes a repository from the local filesystem.
-func removeRepo(url string) (err error) {
+// RemoveRepo removes a repository from the local filesystem.
+func RemoveRepo(url string) (err error) {
 	path, err := stringifyRepo(url)
 	if err != nil {
 		return err

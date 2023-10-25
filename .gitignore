@@ -5,5 +5,7 @@
 /willow
 /*.csv
 /data/
+/*.sqlite
+/config.toml
 
 /.idea/
