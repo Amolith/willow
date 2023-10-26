@@ -94,7 +94,7 @@ func checkAuthorised(dbConn *sql.DB, username string) {
 	}
 	fmt.Println()
 
-	authorised, err := users.Authorised(dbConn, username, string(password))
+	authorised, err := users.UserAuthorised(dbConn, username, string(password))
 	if err != nil {
 		fmt.Println("Error checking authorisation:", err)
 		os.Exit(1)

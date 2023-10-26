@@ -55,9 +55,9 @@ func Register(dbConn *sql.DB, username, password string) error {
 // Delete removes a user from the database.
 func Delete(dbConn *sql.DB, username string) error { return db.DeleteUser(dbConn, username) }
 
-// Authorised accepts a username string, a token string, and returns true if the
+// UserAuthorised accepts a username string, a token string, and returns true if the
 // user is authorised, false if not, and an error if one is encountered.
-func Authorised(dbConn *sql.DB, username, token string) (bool, error) {
+func UserAuthorised(dbConn *sql.DB, username, token string) (bool, error) {
 	dbHash, dbSalt, err := db.GetUser(dbConn, username)
 	if err != nil {
 		return false, err
@@ -71,21 +71,38 @@ func Authorised(dbConn *sql.DB, username, token string) (bool, error) {
 	return dbHash == providedHash, nil
 }
 
-// GetSession accepts a session cookie string and returns the username
-func GetSession(dbConn *sql.DB, session string) (string, time.Time, error) {
-	return db.GetSession(dbConn, session)
+// SessionAuthorised accepts a session string and returns true if the session is
+// valid and false if not.
+func SessionAuthorised(dbConn *sql.DB, session string) (bool, error) {
+	dbResult, expiry, err := db.GetSession(dbConn, session)
+	if dbResult == "" || expiry.Before(time.Now()) || err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
-// InvalidateSession invalidates a session by setting the expiration date to the
-// current time.
+// InvalidateSession invalidates a session by setting the expiration date to now.
 func InvalidateSession(dbConn *sql.DB, session string) error {
 	return db.InvalidateSession(dbConn, session, time.Now())
 }
 
-// CreateSession accepts a username and a token and creates a session in the
-// database.
-func CreateSession(dbConn *sql.DB, username, token string, expiry time.Time) error {
-	return db.CreateSession(dbConn, username, token, expiry)
+// CreateSession accepts a username, generates a token, stores it in the
+// database, and returns it
+func CreateSession(dbConn *sql.DB, username string) (string, time.Time, error) {
+	token, err := generateSalt()
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	expiry := time.Now().Add(7 * 24 * time.Hour)
+
+	err = db.CreateSession(dbConn, username, token, expiry)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	return token, expiry, nil
 }
 
 // GetUsers returns a list of all users in the database as a slice of strings.

@@ -6,6 +6,7 @@ package rss
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/microcosm-cc/bluemonday"
@@ -27,7 +28,8 @@ var (
 
 func GetReleases(feedURL string) ([]Release, error) {
 	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(feedURL + "/releases.atom")
+
+	feed, err := fp.ParseURL(strings.TrimSuffix(feedURL, "/") + "/releases.atom")
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -43,9 +45,6 @@ func GetReleases(feedURL string) ([]Release, error) {
 			Date:    *item.PublishedParsed,
 		})
 	}
-
-	// TODO: Doesn't seem to work?
-	// sort.Slice(p.Releases, func(i, j int) bool { return p.Releases[i].Date.After(p.Releases[j].Date) })
 
 	return releases, nil
 }

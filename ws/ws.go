@@ -8,12 +8,14 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+	"git.sr.ht/~amolith/willow/users"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"text/template"
+	"time"
 
 	"git.sr.ht/~amolith/willow/project"
 	"github.com/microcosm-cc/bluemonday"
@@ -153,12 +155,118 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: do this
+	if r.Method == http.MethodGet {
+		if h.isAuthorised(r) {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
+		login, err := fs.ReadFile("static/login.html")
+		if err != nil {
+			fmt.Println("Error reading login.html:", err)
+		}
+
+		if _, err := io.WriteString(w, string(login)); err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	if r.Method == http.MethodPost {
+		err := r.ParseForm()
+		if err != nil {
+			fmt.Println(err)
+		}
+		username := bmStrict.Sanitize(r.FormValue("username"))
+		password := bmStrict.Sanitize(r.FormValue("password"))
+
+		if username == "" || password == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			_, err := w.Write([]byte("No data provided"))
+			if err != nil {
+				fmt.Println(err)
+			}
+			return
+		}
+
+		authorised, err := users.UserAuthorised(h.DbConn, username, password)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, err := w.Write([]byte(fmt.Sprintf("Error logging in: %s", err)))
+			if err != nil {
+				fmt.Println(err)
+			}
+			return
+		}
+
+		if !authorised {
+			w.WriteHeader(http.StatusUnauthorized)
+			_, err := w.Write([]byte("Incorrect username or password"))
+			if err != nil {
+				fmt.Println(err)
+			}
+			return
+		}
+
+		session, expiry, err := users.CreateSession(h.DbConn, username)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, err := w.Write([]byte(fmt.Sprintf("Error creating session: %s", err)))
+			if err != nil {
+				fmt.Println(err)
+			}
+			return
+		}
+
+		maxAge := int(expiry.Sub(time.Now()).Seconds())
+
+		cookie := http.Cookie{
+			Name:     "id",
+			Value:    session,
+			MaxAge:   maxAge,
+			HttpOnly: true,
+			SameSite: http.SameSiteStrictMode,
+			Secure:   true,
+		}
+
+		http.SetCookie(w, &cookie)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
 }
 
+func (h Handler) LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("id")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	err = users.InvalidateSession(h.DbConn, cookie.Value)
+	if err != nil {
+		fmt.Println(err)
+		_, err = w.Write([]byte(fmt.Sprintf("Error logging out: %s", err)))
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	cookie.MaxAge = -1
+	http.SetCookie(w, cookie)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+// isAuthorised makes a database request to the sessions table to see if the
+// user has a valid session cookie.
 func (h Handler) isAuthorised(r *http.Request) bool {
-	// TODO: do this
-	return false
+	cookie, err := r.Cookie("id")
+	if err != nil {
+		return false
+	}
+
+	authorised, err := users.SessionAuthorised(h.DbConn, cookie.Value)
+	if err != nil {
+		fmt.Println("Error checking session:", err)
+		return false
+	}
+
+	return authorised
 }
 
 func StaticHandler(writer http.ResponseWriter, request *http.Request) {

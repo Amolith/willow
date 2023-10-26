@@ -64,6 +64,7 @@ func fetchReleases(p Project) (Project, error) {
 	case "github", "gitea", "forgejo":
 		rssReleases, err := rss.GetReleases(p.URL)
 		if err != nil {
+			fmt.Println("Error getting RSS releases:", err)
 			return p, err
 		}
 		for _, release := range rssReleases {
