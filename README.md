@@ -42,19 +42,21 @@ where. I've recorded some of my other ideas and plans in [my wiki].
 ## Installation and use
 
 * Clone the repo
-* Build the binary with `CGO_ENABLED=0 go build .`
+* Build the binary with `CGO_ENABLED=0 go build -ldflags="-s -w" -o willow ./cmd`
 * Upload it to a remote server
 * Execute the binary
-* Reverse proxy `localhost:1337`
+* Edit the `config.toml`
+* Create a user with `./willow -a <username>`
+* Execute the binary again
+* Reverse proxy `http://localhost:1313`
 * Open the web UI
 * Click `Track new project`
 * Fill out the form
 * Indicate which version you're currently on
 * That's it!
 
-Note that there's currently no authentication, so consider putting your instance
-behind HTTP Basic Auth, keeping it private, or helping me implement
-authentication.
+Note that I still consider the project to be in _alpha_ state. There will be
+bugs; please help fix them!
 
 ## Contributing
 
