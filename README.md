@@ -104,6 +104,8 @@ section._
 
 - [just](https://github.com/casey/just)
   - Command runner to simplify use of the required tools
+- [air](https://github.com/cosmtrek/air)
+  - Watches source files and rebuilds/executes the project when sources change
 
 ### Configuring git for git send-email
 
