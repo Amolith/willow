@@ -1,0 +1,63 @@
+html {
+    max-width: 500px;
+    margin: auto auto;
+    color: #2f2f2f;
+    background: white;
+}
+
+a {
+    color: #0640e0;
+}
+
+a:visited {
+    color: #0640e0;
+}
+
+.project {
+    max-width: 500px;
+    border: 2px solid #ccc;
+    background: #f8f8f8;
+    border-radius: 5px;
+    margin-top: 20px;
+    padding: 20px 20px 0 20px;
+}
+
+.project > h2 {
+    margin-top: 0;
+}
+
+.project > h2 > span {
+    float: right;
+}
+
+.project > details > pre {
+    overflow: scroll;
+}
+
+summary {
+    cursor: pointer;
+}
+
+details summary > * {
+    display: inline;
+}
+
+@media (prefers-color-scheme: dark) {
+    html {
+        background: #171717;
+        color: #ccc;
+    }
+
+    a {
+        color: #5582ff;
+    }
+
+    a:visited {
+        color: #5582ff;
+    }
+
+    .project {
+        border: 2px solid #444;
+        background: #1c1c1c;
+    }
+}

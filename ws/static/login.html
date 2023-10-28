@@ -4,17 +4,22 @@
         <title>Willow</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="title" content="Willow">
-        <meta name="description" content="Willow">
-        <style>
-html {
-  max-width: 500px;
-  margin: auto auto;
-}
-        </style>
+        <meta name="description" content="Forge-agnostic software release tracker">
+
+        <!-- Indicate that we support both light and dark mode -->
+        <meta name="color-scheme" content="dark light">
+
+        <!-- Preload CSS reset -->
+        <link rel="preload" href="/static/reset.css" as="style" />
+        <link rel="stylesheet" href="/static/reset.css" />
+
+        <!-- Preload CSS styles -->
+        <link rel="preload" href="/static/styles.css" as="style" />
+        <link rel="stylesheet" href="/static/styles.css" />
     </head>
     <body>
         <h1>Willow</h1>
-        <form method="POST">
+        <form method="post">
             <div class="input">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username">

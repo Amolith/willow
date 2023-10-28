@@ -271,7 +271,6 @@ func (h Handler) isAuthorised(r *http.Request) bool {
 
 func StaticHandler(writer http.ResponseWriter, request *http.Request) {
 	resource := strings.TrimPrefix(request.URL.Path, "/")
-	// if path ends in .css, set content type to text/css
 	if strings.HasSuffix(resource, ".css") {
 		writer.Header().Set("Content-Type", "text/css")
 	} else if strings.HasSuffix(resource, ".js") {

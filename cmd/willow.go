@@ -105,11 +105,11 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", wsHandler.RootHandler)
-	mux.HandleFunc("/static", ws.StaticHandler)
+	mux.HandleFunc("/static/", ws.StaticHandler)
 	mux.HandleFunc("/new", wsHandler.NewHandler)
 	mux.HandleFunc("/login", wsHandler.LoginHandler)
 	mux.HandleFunc("/logout", wsHandler.LogoutHandler)
+	mux.HandleFunc("/", wsHandler.RootHandler)
 
 	httpServer := &http.Server{
 		Addr:    config.Server.Listen,
