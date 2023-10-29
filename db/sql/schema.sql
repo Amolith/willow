@@ -4,43 +4,44 @@
 
 -- Create table of users with username, password hash, salt, and creation
 -- timestamp
-CREATE TABLE users (
-    username       VARCHAR(255)  NOT         NULL,
-    hash           VARCHAR(255)  NOT         NULL,
-    salt           VARCHAR(255)  NOT         NULL,
-    created_at     TIMESTAMP     NOT         NULL   DEFAULT  CURRENT_TIMESTAMP,
-    PRIMARY        KEY           (username)
+CREATE TABLE users
+(
+    username   TEXT      NOT NULL PRIMARY KEY,
+    hash       TEXT      NOT NULL,
+    salt       TEXT      NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create table of sessions with session GUID, username, and timestamp of when
 -- the session was created
-CREATE TABLE sessions (
-    token        VARCHAR(255)  NOT          NULL,
-    username     VARCHAR(255)  NOT          NULL,
-    expires      TIMESTAMP     NOT          NULL,
-    created_at   TIMESTAMP     NOT          NULL   DEFAULT  CURRENT_TIMESTAMP,
-    PRIMARY      KEY           (token)
+CREATE TABLE sessions
+(
+    token      TEXT      NOT NULL,
+    username   TEXT      NOT NULL,
+    expires    TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create table of tracked projects with URL, name, forge, running version, and
 -- timestamp of when the project was added
-CREATE TABLE projects (
-    url         VARCHAR(255)  NOT    NULL,
-    name        VARCHAR(255)  NOT    NULL,
-    forge       VARCHAR(255)  NOT    NULL,
-    version     VARCHAR(255)  NOT    NULL,
-    created_at  TIMESTAMP     NOT    NULL   DEFAULT  CURRENT_TIMESTAMP,
-    PRIMARY     KEY           (url)
+CREATE TABLE projects
+(
+    url        TEXT      NOT NULL,
+    name       TEXT      NOT NULL,
+    forge      TEXT      NOT NULL,
+    version    TEXT      NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create table of project releases with the project URL and the release tags,
 -- contents, URLs, and dates
-CREATE TABLE releases (
-    project_url  VARCHAR(255)  NOT    NULL,
-    release_url  VARCHAR(255)  NOT    NULL,
-    tag          VARCHAR(255)  NOT    NULL,
-    content      TEXT          NOT    NULL,
-    date         TIMESTAMP     NOT    NULL,
-    created_at   TIMESTAMP     NOT    NULL   DEFAULT  CURRENT_TIMESTAMP,
-    PRIMARY      KEY           (release_url)
+CREATE TABLE releases
+(
+    id          TEXT      NOT NULL PRIMARY KEY,
+    project_url TEXT      NOT NULL,
+    release_url TEXT      NOT NULL,
+    tag         TEXT      NOT NULL,
+    content     TEXT      NOT NULL,
+    date        TIMESTAMP NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

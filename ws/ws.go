@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
-	"git.sr.ht/~amolith/willow/users"
 	"io"
 	"net/http"
 	"net/url"
@@ -16,6 +15,8 @@ import (
 	"sync"
 	"text/template"
 	"time"
+
+	"git.sr.ht/~amolith/willow/users"
 
 	"git.sr.ht/~amolith/willow/project"
 	"github.com/microcosm-cc/bluemonday"

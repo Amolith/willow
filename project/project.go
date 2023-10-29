@@ -5,6 +5,7 @@
 package project
 
 import (
+	"crypto/sha256"
 	"database/sql"
 	"fmt"
 	"log"
@@ -40,7 +41,7 @@ func GetReleases(dbConn *sql.DB, proj Project) (Project, error) {
 	}
 
 	if len(ret) == 0 {
-		return fetchReleases(proj)
+		return fetchReleases(dbConn, proj)
 	}
 
 	for _, row := range ret {
@@ -58,7 +59,7 @@ func GetReleases(dbConn *sql.DB, proj Project) (Project, error) {
 }
 
 // fetchReleases fetches releases from a project's forge given its URI
-func fetchReleases(p Project) (Project, error) {
+func fetchReleases(dbConn *sql.DB, p Project) (Project, error) {
 	var err error
 	switch p.Forge {
 	case "github", "gitea", "forgejo":
@@ -74,6 +75,11 @@ func fetchReleases(p Project) (Project, error) {
 				URL:     release.URL,
 				Date:    release.Date,
 			})
+			err = upsert(dbConn, p.URL, p.Releases)
+			if err != nil {
+				log.Printf("Error upserting release: %v", err)
+				return p, err
+			}
 		}
 	default:
 		gitReleases, err := git.GetReleases(p.URL, p.Forge)
@@ -87,12 +93,32 @@ func fetchReleases(p Project) (Project, error) {
 				URL:     release.URL,
 				Date:    release.Date,
 			})
+			err = upsert(dbConn, p.URL, p.Releases)
+			if err != nil {
+				log.Printf("Error upserting release: %v", err)
+				return p, err
+			}
 		}
 	}
 	sort.Slice(p.Releases, func(i, j int) bool {
 		return p.Releases[i].Date.After(p.Releases[j].Date)
 	})
 	return p, err
+}
+
+// upsert updates or inserts a project release into the database
+func upsert(dbConn *sql.DB, url string, releases []Release) error {
+	for _, release := range releases {
+		date := release.Date.Format("2006-01-02 15:04:05")
+		idByte := sha256.Sum256([]byte(url + release.URL + release.Tag + date))
+		id := fmt.Sprintf("%x", idByte)
+		err := db.UpsertRelease(dbConn, id, url, release.URL, release.Tag, release.Content, date)
+		if err != nil {
+			log.Printf("Error upserting release: %v", err)
+			return err
+		}
+	}
+	return nil
 }
 
 func Track(dbConn *sql.DB, manualRefresh *chan struct{}, name, url, forge, release string) {
@@ -126,7 +152,7 @@ func RefreshLoop(dbConn *sql.DB, interval int, manualRefresh, req *chan struct{}
 			fmt.Println("Error getting projects:", err)
 		}
 		for i, p := range projectsList {
-			p, err := fetchReleases(p)
+			p, err := fetchReleases(dbConn, p)
 			if err != nil {
 				fmt.Println(err)
 				continue
@@ -137,12 +163,10 @@ func RefreshLoop(dbConn *sql.DB, interval int, manualRefresh, req *chan struct{}
 			return strings.ToLower(projectsList[i].Name) < strings.ToLower(projectsList[j].Name)
 		})
 		for i := range projectsList {
-			for j := range projectsList[i].Releases {
-				err = db.UpsertRelease(dbConn, projectsList[i].URL, projectsList[i].Releases[j].URL, projectsList[i].Releases[j].Tag, projectsList[i].Releases[j].Content, projectsList[i].Releases[j].Date.Format("2006-01-02 15:04:05"))
-				if err != nil {
-					fmt.Println("Error upserting release:", err)
-					continue
-				}
+			err = upsert(dbConn, projectsList[i].URL, projectsList[i].Releases)
+			if err != nil {
+				fmt.Println("Error upserting release:", err)
+				continue
 			}
 		}
 		return projectsList

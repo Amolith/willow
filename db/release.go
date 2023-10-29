@@ -4,7 +4,9 @@
 
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 // AddRelease adds a release for a project with a given URL to the database
 
@@ -14,16 +16,16 @@ import "database/sql"
 
 // UpsertRelease adds or updates a release for a project with a given URL in the
 // database
-func UpsertRelease(db *sql.DB, projectURL, releaseURL, tag, content, date string) error {
-	_, err := db.Exec(`INSERT INTO releases (project_url, release_url, tag, content, date)
-		VALUES (?, ?, ?, ?, ?)
-		ON CONFLICT(release_url) DO 
+func UpsertRelease(db *sql.DB, id, projectURL, releaseURL, tag, content, date string) error {
+	_, err := db.Exec(`INSERT INTO releases (id, project_url, release_url, tag, content, date)
+		VALUES (?, ?, ?, ?, ?, ?)
+		ON CONFLICT(id) DO 
 			UPDATE SET
 				release_url = excluded.release_url,
 				content = excluded.content,
 				tag = excluded.tag,
 				content = excluded.content,
-				date = excluded.date;`, projectURL, releaseURL, tag, content, date)
+				date = excluded.date;`, id, projectURL, releaseURL, tag, content, date)
 	return err
 }
 

@@ -7,6 +7,7 @@ package git
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"sort"
@@ -64,31 +65,39 @@ func GetReleases(gitURI, forge string) ([]Release, error) {
 	releases := make([]Release, 0)
 
 	err = tagRefs.ForEach(func(tagRef *plumbing.Reference) error {
-		obj, err := r.TagObject(tagRef.Hash())
-		switch {
-		case errors.Is(err, plumbing.ErrObjectNotFound):
-			// This is a lightweight tag, not an annotated tag, skip it
-			return nil
-		case err == nil:
-			tagURL := ""
-			tagName := bmStrict.Sanitize(tagRef.Name().Short())
-			switch forge {
-			case "sourcehut":
-				tagURL = "https://" + httpURI + "/refs/" + tagName
-			case "gitlab":
-				tagURL = "https://" + httpURI + "/-/releases/" + tagName
-			default:
-				tagURL = ""
+		tagObj, err := r.TagObject(tagRef.Hash())
+
+		var message string
+		var date time.Time
+		if errors.Is(err, plumbing.ErrObjectNotFound) {
+			commitTag, err := r.CommitObject(tagRef.Hash())
+			if err != nil {
+				return err
 			}
-			releases = append(releases, Release{
-				Tag:     tagName,
-				Content: bmUGC.Sanitize(obj.Message),
-				URL:     tagURL,
-				Date:    obj.Tagger.When,
-			})
-		default:
-			return err
+			message = commitTag.Message
+			date = commitTag.Committer.When
+		} else {
+			message = tagObj.Message
+			date = tagObj.Tagger.When
 		}
+
+		tagURL := ""
+		tagName := bmStrict.Sanitize(tagRef.Name().Short())
+		switch forge {
+		case "sourcehut":
+			tagURL = "https://" + httpURI + "/refs/" + tagName
+		case "gitlab":
+			tagURL = "https://" + httpURI + "/-/releases/" + tagName
+		default:
+			tagURL = ""
+		}
+
+		releases = append(releases, Release{
+			Tag:     tagName,
+			Content: bmUGC.Sanitize(message),
+			URL:     tagURL,
+			Date:    date,
+		})
 		return nil
 	})
 	if err != nil {
@@ -139,7 +148,46 @@ func RemoveRepo(url string) (err error) {
 		return err
 	}
 	err = os.RemoveAll(path)
+	if err != nil {
+		return err
+	}
+
+	// TODO: Check whether the two parent directories are empty and remove them if
+	// so
+	for i := 0; i < 2; i++ {
+		path = strings.TrimSuffix(path, "/")
+		if path == "data" {
+			break
+		}
+		empty, err := dirEmpty(path)
+		if err != nil {
+			return err
+		}
+		if empty {
+			err = os.Remove(path)
+			if err != nil {
+				return err
+			}
+		}
+		path = path[:strings.LastIndex(path, "/")]
+	}
+
 	return err
+}
+
+// dirEmpty checks if a directory is empty.
+func dirEmpty(name string) (empty bool, err error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err
 }
 
 // stringifyRepo accepts a repository URI string and the corresponding local
