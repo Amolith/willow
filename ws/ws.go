@@ -99,9 +99,7 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				Forge: forge,
 			}
 
-			if strings.HasSuffix(proj.URL, ".git") {
-				proj.URL = proj.URL[:len(proj.URL)-4]
-			}
+			proj.URL = strings.TrimSuffix(proj.URL, ".git")
 
 			proj, err := project.GetReleases(h.DbConn, proj)
 			if err != nil {
@@ -226,7 +224,7 @@ func (h Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		maxAge := int(expiry.Sub(time.Now()).Seconds())
+		maxAge := int(time.Until(expiry))
 
 		cookie := http.Cookie{
 			Name:     "id",
