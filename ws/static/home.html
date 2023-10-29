@@ -18,15 +18,15 @@
         <link rel="stylesheet" href="/static/styles.css" />
     </head>
     <body>
-        <h1>Willow</h1>
+        <h1>Willow &nbsp;&nbsp;&nbsp;<span><a href="/logout">Log out</a></span></h1>
         <p><a href="/new">Track a new project</a></p>
         <div class="projects">
         {{- range . -}}
             <div class="project">
-                <h2><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span style="font-size: 12px;"><a href="/new?action=delete&url={{ .URL }}" class="normal-link">Delete?</a></span></h2>
+                <h2><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span><a href="/new?action=delete&url={{ .URL }}">Delete?</a></span></h2>
                 <p>Currently running {{ .Running }}.</p>
                 {{- if ne .Running (index .Releases 0).Tag -}}
-                <p>New release available: <a href="{{ (index .Releases 0).URL }}" class="normal-link">{{ (index .Releases 0).Tag }}</a>. <a href="/new?action=update&url={{ .URL }}&forge={{ .Forge }}&name={{ .Name }}" class="normal-link">Update?</a></p>
+                <p>New release available: <a href="{{ (index .Releases 0).URL }}">{{ (index .Releases 0).Tag }}</a>. <a href="/new?action=update&url={{ .URL }}&forge={{ .Forge }}&name={{ .Name }}">Update?</a></p>
                 <p>
                     <details>
                         <summary>Expand release notes</summary>

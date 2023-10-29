@@ -21,11 +21,12 @@ a:visited {
 
 .project {
     max-width: 500px;
-    border: 2px solid #ccc;
+    border: 2px solid #2f2f2f;
     background: #f8f8f8;
     border-radius: 5px;
     margin-top: 20px;
     padding: 20px 20px 0 20px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
 .project > h2 {
@@ -33,6 +34,12 @@ a:visited {
 }
 
 .project > h2 > span {
+    font-size: 12px;
+    float: right;
+}
+
+body > h1 > span {
+    font-size: 12px;
     float: right;
 }
 
@@ -63,7 +70,7 @@ details summary > * {
     }
 
     .project {
-        border: 2px solid #444;
+        border: 2px solid #ccc;
         background: #1c1c1c;
     }
 }
