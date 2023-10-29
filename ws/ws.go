@@ -89,6 +89,7 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				if err != nil {
 					fmt.Println(err)
 				}
+				return
 			}
 
 			proj := project.Project{
@@ -96,6 +97,11 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				Name:  name,
 				Forge: forge,
 			}
+
+			if strings.HasSuffix(proj.URL, ".git") {
+				proj.URL = proj.URL[:len(proj.URL)-4]
+			}
+
 			proj, err := project.GetReleases(h.DbConn, proj)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
@@ -103,6 +109,7 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				if err != nil {
 					fmt.Println(err)
 				}
+				return
 			}
 			tmpl := template.Must(template.ParseFS(fs, "static/select-release.html"))
 			if err := tmpl.Execute(w, proj); err != nil {
@@ -116,6 +123,7 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				if err != nil {
 					fmt.Println(err)
 				}
+				return
 			}
 
 			project.Untrack(h.DbConn, h.ManualRefresh, submittedURL)
@@ -246,6 +254,7 @@ func (h Handler) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println(err)
 		}
+		return
 	}
 	cookie.MaxAge = -1
 	http.SetCookie(w, cookie)
