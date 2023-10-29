@@ -33,6 +33,10 @@ a:visited {
     margin-top: 0;
 }
 
+.project > p:first-of-type {
+    margin-bottom: 16px;
+}
+
 .project > h2 > span {
     font-size: 12px;
     float: right;
