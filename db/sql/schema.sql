@@ -16,7 +16,7 @@ CREATE TABLE users
 -- the session was created
 CREATE TABLE sessions
 (
-    token      TEXT      NOT NULL,
+    token      TEXT      NOT NULL PRIMARY KEY,
     username   TEXT      NOT NULL,
     expires    TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -26,7 +26,7 @@ CREATE TABLE sessions
 -- timestamp of when the project was added
 CREATE TABLE projects
 (
-    url        TEXT      NOT NULL,
+    url        TEXT      NOT NULL PRIMARY KEY,
     name       TEXT      NOT NULL,
     forge      TEXT      NOT NULL,
     version    TEXT      NOT NULL,
