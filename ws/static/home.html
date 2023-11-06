@@ -21,27 +21,37 @@
         <h1>Willow &nbsp;&nbsp;&nbsp;<span><a href="/logout">Log out</a></span></h1>
         <p><a href="/new">Track a new project</a></p>
         <div class="projects">
+        <!-- Range through projects that aren't yet up-to-date -->
         {{- range . -}}
-            <div class="project">
-                <h2><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span><a href="/new?action=delete&url={{ .URL }}">Delete?</a></span></h2>
-                <p>Currently running {{ .Running }}.</p>
-                {{- if ne .Running (index .Releases 0).Tag -}}
-                <p>New release available: <a href="{{ (index .Releases 0).URL }}">{{ (index .Releases 0).Tag }}</a>. <a href="/new?action=update&url={{ .URL }}&forge={{ .Forge }}&name={{ .Name }}">Update?</a></p>
-                <p>
-                    <details>
-                        <summary>Expand release notes</summary>
-                        {{- if eq .Forge "github" "gitea" "forgejo" -}}
-                            {{- (index .Releases 0).Content -}}
-                        {{- else -}}
-                            <pre>
-                            {{- (index .Releases 0).Content -}}
-                            </pre>
-                        {{- end -}}
-                    </details>
-                </p>
-                {{- end -}}
-            </div>
-        {{- end -}}
+        {{- if ne .Running (index .Releases 0).Tag -}}
+        <div class="project">
+            <h2><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span><a href="/new?action=delete&url={{ .URL }}">Delete?</a></span></h2>
+            <p>You've selected {{ .Running }}. <a href="/new?action=update&url={{ .URL }}&forge={{ .Forge }}&name={{ .Name }}">Modify?</a></p>
+            <p>Latest: <a href="{{ (index .Releases 0).URL }}">{{ (index .Releases 0).Tag }}</a></p>
+            <p>
+                <details>
+                    <summary>Expand release notes</summary>
+                    {{- if eq .Forge "github" "gitea" "forgejo" -}}
+                    {{- (index .Releases 0).Content -}}
+                    {{- else -}}
+                    <pre>
+                    {{- (index .Releases 0).Content -}}
+                    </pre>
+                    {{- end -}}
+                </details>
+            </p>
         </div>
+        {{- end -}}
+        {{- end -}}
+
+        <!-- Range through projects that _are_ up-to-date -->
+        {{- range . -}}
+        {{- if eq .Running (index .Releases 0).Tag -}}
+        <div class="project">
+            <h2><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span style="font-size: 12px;"><a href="/new?action=delete&url={{ .URL }}">Delete?</a></span></h2>
+            <p>You've selected {{ .Running }}. <a href="/new?action=update&url={{ .URL }}&forge={{ .Forge }}&name={{ .Name }}">Modify?</a></p>
+        </div>
+        {{- end -}}
+        {{- end -}}
     </body>
 </html>
