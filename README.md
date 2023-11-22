@@ -41,6 +41,10 @@ where. I've recorded some of my other ideas and plans in [my wiki].
 
 ## Installation and use
 
+_**Note:** prebuilt binaries will be available after I release [v0.0.1]_
+
+[0.0.1]: https://todo.sr.ht/~amolith/willow?search=status%3Aopen%20label%3A%22v0.0.1%22
+
 * Clone the repo
 * Build the binary with `CGO_ENABLED=0 go build -ldflags="-s -w" -o willow ./cmd`
 * Upload it to a remote server
