@@ -19,6 +19,11 @@ near future._
 
 ## What is it?
 
+_If you'd rather watch a video, I gave a [lightning talk on Willow] at the 2023
+Ubuntu Summit._
+
+[lightning talk on Willow]: https://youtu.be/XIGxKyekvBQ?t=29900
+
 Willow tracks software releases across arbitrary forge platforms by trying to
 support one of the very few things they all have in common: the VCS. At the
 moment, git is the _only_ supported VCS, but I would be interested in adding
