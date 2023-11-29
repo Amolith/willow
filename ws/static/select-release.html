@@ -44,5 +44,9 @@
             <input type="hidden" name="forge" value="{{ .Forge }}">
             <input class="button" type="submit" formaction="/new" value="Track future releases">
         </form>
+        <!-- Append these if they ever start limited RSS entries: `(eq $forge "gitea") (eq $forge "forgejo")` -->
+        {{- if or (eq $forge "github") -}}
+        <small>Some RSS feeds (notably GitHub's) include a limited number of releases. If you don't see your version, please change the forge type to "Other".</small>
+        {{- end -}}
     </body>
 </html>
