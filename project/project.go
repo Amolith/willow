@@ -13,6 +13,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/unascribed/FlexVer/go/flexver"
+
 	"git.sr.ht/~amolith/willow/db"
 	"git.sr.ht/~amolith/willow/git"
 	"git.sr.ht/~amolith/willow/rss"
@@ -52,9 +54,7 @@ func GetReleases(dbConn *sql.DB, proj Project) (Project, error) {
 			Date:    time.Time{},
 		})
 	}
-	sort.Slice(proj.Releases, func(i, j int) bool {
-		return proj.Releases[i].Date.After(proj.Releases[j].Date)
-	})
+	proj.Releases = SortReleases(proj.Releases)
 	return proj, nil
 }
 
@@ -100,10 +100,15 @@ func fetchReleases(dbConn *sql.DB, p Project) (Project, error) {
 			}
 		}
 	}
-	sort.Slice(p.Releases, func(i, j int) bool {
-		return p.Releases[i].Date.After(p.Releases[j].Date)
-	})
+	p.Releases = SortReleases(p.Releases)
 	return p, err
+}
+
+func SortReleases(releases []Release) []Release {
+	sort.Slice(releases, func(i, j int) bool {
+		return !flexver.Less(releases[i].Tag, releases[j].Tag)
+	})
+	return releases
 }
 
 // upsert updates or inserts a project release into the database

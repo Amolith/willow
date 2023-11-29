@@ -10,7 +10,6 @@ import (
 	"io"
 	"net/url"
 	"os"
-	"sort"
 	"strings"
 	"time"
 
@@ -103,8 +102,6 @@ func GetReleases(gitURI, forge string) ([]Release, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	sort.Slice(releases, func(i, j int) bool { return releases[i].Date.After(releases[j].Date) })
 
 	return releases, nil
 }
