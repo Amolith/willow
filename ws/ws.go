@@ -74,7 +74,7 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			proj, err := project.GetProject(h.DbConn, submittedURL)
-			if err != nil {
+			if err != nil && err != sql.ErrNoRows {
 				w.WriteHeader(http.StatusBadRequest)
 				_, err := w.Write([]byte(fmt.Sprintf("Error getting project: %s", err)))
 				if err != nil {

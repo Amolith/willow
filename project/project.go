@@ -200,9 +200,6 @@ func GetProject(dbConn *sql.DB, url string) (Project, error) {
 	if err != nil {
 		return Project{}, err
 	}
-	if len(projectDB) == 0 {
-		return Project{}, nil
-	}
 	p := Project{
 		URL:     projectDB["url"],
 		Name:    projectDB["name"],
