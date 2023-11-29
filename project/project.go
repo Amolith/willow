@@ -196,12 +196,14 @@ func RefreshLoop(dbConn *sql.DB, interval int, manualRefresh, req *chan struct{}
 
 // GetProject returns a project from the database
 func GetProject(dbConn *sql.DB, url string) (Project, error) {
-	var p Project
 	projectDB, err := db.GetProject(dbConn, url)
 	if err != nil {
-		return p, err
+		return Project{}, err
 	}
-	p = Project{
+	if len(projectDB) == 0 {
+		return Project{}, nil
+	}
+	p := Project{
 		URL:     projectDB["url"],
 		Name:    projectDB["name"],
 		Forge:   projectDB["forge"],

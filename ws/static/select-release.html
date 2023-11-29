@@ -24,8 +24,9 @@
                 <p>Which release of {{ .Name }} are you currently running?</p>
                 {{- $url := .URL -}}
                 {{- $forge := .Forge -}}
+                {{- $running := .Running -}}
                 {{- range .Releases -}}
-                <input type="radio" id="{{ .Tag }}" name="release" value="{{ .Tag }}">
+                <input type="radio" id="{{ .Tag }}" name="release" value="{{ .Tag }}" {{- if eq $running .Tag }} checked {{- end -}}>
                 {{- if ne .URL "" -}}
                 <label for="{{ .Tag }}"><a href="{{ .URL }}">{{ .Tag }}</a></label><br>
                 {{- else -}}
@@ -44,7 +45,7 @@
             <input type="hidden" name="forge" value="{{ .Forge }}">
             <input class="button" type="submit" formaction="/new" value="Track future releases">
         </form>
-        <!-- Append these if they ever start limited RSS entries: `(eq $forge "gitea") (eq $forge "forgejo")` -->
+        <!-- Append these if they ever start limiting RSS entries: `(eq $forge "gitea") (eq $forge "forgejo")` -->
         {{- if or (eq $forge "github") -}}
         <small>Some RSS feeds (notably GitHub's) include a limited number of releases. If you don't see your version, please change the forge type to "Other".</small>
         {{- end -}}

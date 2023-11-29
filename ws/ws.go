@@ -73,35 +73,48 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			forge := bmStrict.Sanitize(params.Get("forge"))
-			if forge == "" {
+			proj, err := project.GetProject(h.DbConn, submittedURL)
+			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				_, err := w.Write([]byte("No forge provided"))
+				_, err := w.Write([]byte(fmt.Sprintf("Error getting project: %s", err)))
 				if err != nil {
 					fmt.Println(err)
 				}
 				return
 			}
 
-			name := bmStrict.Sanitize(params.Get("name"))
-			if name == "" {
-				w.WriteHeader(http.StatusBadRequest)
-				_, err := w.Write([]byte("No name provided"))
-				if err != nil {
-					fmt.Println(err)
+			if proj.Running == "" {
+				forge := bmStrict.Sanitize(params.Get("forge"))
+				if forge == "" {
+					w.WriteHeader(http.StatusBadRequest)
+					_, err := w.Write([]byte("No forge provided"))
+					if err != nil {
+						fmt.Println(err)
+					}
+					return
 				}
-				return
+
+				name := bmStrict.Sanitize(params.Get("name"))
+				if name == "" {
+					w.WriteHeader(http.StatusBadRequest)
+					_, err := w.Write([]byte("No name provided"))
+					if err != nil {
+						fmt.Println(err)
+					}
+					return
+				}
+
+				proj = project.Project{
+					URL:   submittedURL,
+					Name:  name,
+					Forge: forge,
+				}
+
+				proj.URL = strings.TrimSuffix(proj.URL, ".git")
+
 			}
 
-			proj := project.Project{
-				URL:   submittedURL,
-				Name:  name,
-				Forge: forge,
-			}
-
-			proj.URL = strings.TrimSuffix(proj.URL, ".git")
-
-			proj, err := project.GetReleases(h.DbConn, proj)
+			proj, err = project.GetReleases(h.DbConn, proj)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				_, err := w.Write([]byte(fmt.Sprintf("Error getting releases: %s", err)))
@@ -110,6 +123,7 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				return
 			}
+
 			tmpl := template.Must(template.ParseFS(fs, "static/select-release.html"))
 			if err := tmpl.Execute(w, proj); err != nil {
 				fmt.Println(err)
