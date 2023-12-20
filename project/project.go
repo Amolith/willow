@@ -115,8 +115,7 @@ func SortReleases(releases []Release) []Release {
 func upsert(dbConn *sql.DB, url string, releases []Release) error {
 	for _, release := range releases {
 		date := release.Date.Format("2006-01-02 15:04:05")
-		idByte := sha256.Sum256([]byte(url + release.URL + release.Tag + date))
-		id := fmt.Sprintf("%x", idByte)
+		id := genReleaseID(url, release.URL, release.Tag)
 		err := db.UpsertRelease(dbConn, id, url, release.URL, release.Tag, release.Content, date)
 		if err != nil {
 			log.Printf("Error upserting release: %v", err)
@@ -124,6 +123,11 @@ func upsert(dbConn *sql.DB, url string, releases []Release) error {
 		}
 	}
 	return nil
+}
+
+func genReleaseID(projectURL, releaseURL, tag string) string {
+	idByte := sha256.Sum256([]byte(projectURL + releaseURL + tag))
+	return fmt.Sprintf("%x", idByte)
 }
 
 func Track(dbConn *sql.DB, manualRefresh *chan struct{}, name, url, forge, release string) {
