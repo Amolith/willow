@@ -94,7 +94,7 @@ _If you haven't used mailing lists before, please take a look at [SourceHut's
 documentation](https://man.sr.ht/lists.sr.ht/), especially the etiquette
 section._
 
-### Paperwork 😩
+### Paperwork
 
 The software world changes rapidly and the future is always a little murky. With
 that murk in mind, I require contributors to sign a _**F**iduciary **L**icense
