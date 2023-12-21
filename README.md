@@ -96,10 +96,12 @@ section._
 
 ### Paperwork
 
-The software world changes rapidly and the future is always a little murky. With
-that murk in mind, I require contributors to sign a _**F**iduciary **L**icense
-**A**greement_, or an FLA, that allows me to change Willow's license at any time
-_without_ contributor input, but _with_ stipulations.
+Willow will always be free software, but it's hard to anticipate the future. We
+may want to change to a different Free (FSF approved) and Open Source (OSI
+approved) license in the future. To allow this limited relicensing, I ask
+contributors to sign a _**F**iduciary **L**icense **A**greement_, or an FLA,
+that allows me to change Willow's license at any time _without_ contributor
+input, but _with_ those license limitations.
 
 Willow's FLA transfers the contributor's copyright over their contribution to
 Amolith and limits which licenses he can choose to "licenses the Free Software
