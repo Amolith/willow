@@ -96,7 +96,7 @@ section._
 
 ### Paperwork
 
-Willow will always be free software, but it's hard to anticipate the future. We
+Willow will always be free software, but it's hard to anticipate the future. I
 may want to change to a different Free (FSF approved) and Open Source (OSI
 approved) license in the future. To allow this limited relicensing, I ask
 contributors to sign a _**F**iduciary **L**icense **A**greement_, or an FLA,
