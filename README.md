@@ -98,19 +98,17 @@ section._
 
 Willow will always be free software, but it's hard to anticipate the future. I
 may want to change to a different Free (FSF approved) and Open Source (OSI
-approved) license in the future. To allow this limited relicensing, I ask
-contributors to sign a _**F**iduciary **L**icense **A**greement_, or an FLA,
-that allows me to change Willow's license at any time _without_ contributor
-input, but _with_ those license limitations.
+approved) license in the future. To allow this relicensing within those FOSS
+limits and without requiring me to contact every historical contributor for
+their consent at the time of re-license, I ask contributors to sign a
+_**F**iduciary **L**icense **A**greement_, or an FLA. It's sort of like giving
+me advance consent to license your work under a different free and open source
+license should that become necessary in the future.
 
-Willow's FLA transfers the contributor's copyright over their contribution to
-Amolith and limits which licenses he can choose to "licenses the Free Software
-Foundation classifies as Free Software License and which are approved by the
-Open Source Initiative as Open Source licenses".
-
-Essentially, it allows me to keep Willow's license(s) up-to-date without
-requiring me to contact every historical contributor, and it does all that while
-ensuring Willow remains free software :)
+Precisely, Willow's FLA transfers the contributor's copyright over their
+contribution to Amolith and limits which licenses he can put that work under to
+"licenses the Free Software Foundation classifies as Free Software License and
+which are approved by the Open Source Initiative as Open Source licenses".
 
 Alongside initial contributions, please sign the FLA and email a digital copy to
 amolith@secluded.site. You can sign the FLA by printing, signing, and scanning
