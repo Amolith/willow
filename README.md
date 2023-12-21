@@ -111,7 +111,7 @@ requiring me to contact every historical contributor and it does all that while
 ensuring Willow remains free software :)
 
 Alongside initial contributions, please sign the FLA and email a digital copy to
-[amolith@secluded.site]. You can sign the FLA by printing, signing, and scanning
+amolith@secluded.site. You can sign the FLA by printing, signing, and scanning
 the document, by drawing your signature in a PDF editor like [the one built into
 Firefox],
 
