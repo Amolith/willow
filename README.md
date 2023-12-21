@@ -102,18 +102,18 @@ that murk in mind, I require contributors to sign a _**F**iduciary **L**icense
 _without_ contributor input, but _with_ stipulations.
 
 Willow's FLA transfers the contributor's copyright over their contribution to
-Amolith and limits which licenses he can choose from to "licenses the Free
-Software Foundation classifies as Free Software License and which are approved
-by the Open Source Initiative as Open Source licenses".
+Amolith and limits which licenses he can choose to "licenses the Free Software
+Foundation classifies as Free Software License and which are approved by the
+Open Source Initiative as Open Source licenses".
 
 Essentially, it allows me to keep Willow's license(s) up-to-date without
-requiring me to contact every historical contributor and it does all that while
+requiring me to contact every historical contributor, and it does all that while
 ensuring Willow remains free software :)
 
 Alongside initial contributions, please sign the FLA and email a digital copy to
 amolith@secluded.site. You can sign the FLA by printing, signing, and scanning
-the document, by drawing your signature in a PDF editor like [the one built into
-Firefox],
+the document or by completing the form and drawing your signature in a PDF
+editor like [the one built into Firefox].
 
 [the one built into Firefox]: https://www.mozilla.org/en-US/firefox/features/pdf-editor/
 
