@@ -12,7 +12,7 @@ SPDX-License-Identifier: CC0-1.0
 
 _Forge-agnostic software release tracker_
 
-![screenshot of willow's current web UI](screenshots/2023-10-29.png)
+![screenshot of willow's current web UI](files/2023-10-29.png)
 
 _This UI is a minimal proof-of-concept, it's going to change drastically in the
 near future._
@@ -72,30 +72,74 @@ bugs; please help fix them!
 Contributions are very much welcome! Please take a look at the [ticket
 tracker][todo] and see if there's anything you're interested in working on. If
 there's specific functionality you'd like to see implemented and it's not
-mentioned in the ticket tracker, please post to the [mailing list][email] and
-describe the feature.
+mentioned in the ticket tracker, please send a description to the [mailing
+list][email] so we can discuss its inclusion. If I don't feel like it fits with
+Willow's goals, you're encouraged to fork the project and make whatever changes
+you like!
 
 Questions, comments, and patches can always be sent to the [mailing
 list][email], but I'm also in the [IRC channel][irc]/[XMPP room][xmpp] pretty
-much 24/7. However, I might not see messages right away because I'm working on
-something else (or sleeping) so please stick around.
-
-If you're wanting to introduce a new feature and I don't feel like it fits with
-this project's goal, I encourage you to fork the repo and make whatever changes
-you like!
+much 24/7. I might not see messages right away, so please stick around.
 
 - Email: [~amolith/willow@lists.sr.ht][email]
 - IRC: [irc.libera.chat/#willow][irc]
 - XMPP: [willow@muc.secluded.site][xmpp]
 
 [email]: mailto:~amolith/willow@lists.sr.ht
-[irc]: irc://irc.nixnet.services/#willow
+[irc]: ircs://irc.libera.chat/#willow
 [xmpp]: xmpp:willow@muc.secluded.site?join
 [todo]: https://todo.sr.ht/~amolith/willow
 
 _If you haven't used mailing lists before, please take a look at [SourceHut's
 documentation](https://man.sr.ht/lists.sr.ht/), especially the etiquette
 section._
+
+### Paperwork 😩
+
+The software world changes rapidly and the future is always a little murky. With
+that murk in mind, I require contributors to sign a _**F**iduciary **L**icense
+**A**greement_, or an FLA, that allows me to change Willow's license at any time
+_without_ contributor input, but _with_ stipulations.
+
+Willow's FLA transfers the contributor's copyright over their contribution to
+Amolith and limits which licenses he can choose from to "licenses the Free
+Software Foundation classifies as Free Software License and which are approved
+by the Open Source Initiative as Open Source licenses".
+
+Essentially, it allows me to keep Willow's license(s) up-to-date without
+requiring me to contact every historical contributor and it does all that while
+ensuring Willow remains free software :)
+
+Alongside initial contributions, please sign the FLA and email a digital copy to
+[amolith@secluded.site]. You can sign the FLA by printing, signing, and scanning
+the document, by drawing your signature in a PDF editor like [the one built into
+Firefox],
+
+[the one built into Firefox]: https://www.mozilla.org/en-US/firefox/features/pdf-editor/
+
+- **Individuals** sign the [Individual FLA].
+- Companies, co-ops, non-profits, and other **entities** sign the [Entity FLA]
+  on behalf of their constituent individuals
+
+[Individual FLA]: .files/ifla.pdf
+[Entity FLA]: .files/efla.pdf
+
+### Configuring git...
+
+…for <code>git send-email</code>
+
+``` shell
+git config sendemail.to "~amolith/willow@lists.sr.ht"
+git send-email [HASH]
+```
+
+…for signing the [DCO]
+
+``` shell
+git config format.signOff yes
+```
+
+[DCO]: https://developercertificate.org/
 
 ### Required tools
 
@@ -115,15 +159,6 @@ section._
   - Command runner to simplify use of the required tools
 - [air](https://github.com/cosmtrek/air)
   - Watches source files and rebuilds/executes the project when sources change
-
-### Configuring git for git send-email
-
-First, go through the tutorial on
-[git-send-email.io](https://git-send-email.io/).
-
-``` shell
-git config sendemail.to "~amolith/willow@lists.sr.ht"
-```
 
 [goreportcard-badge]: https://goreportcard.com/badge/git.sr.ht/~amolith/willow
 [goreportcard]: https://goreportcard.com/report/git.sr.ht/~amolith/willow
