@@ -47,7 +47,6 @@ var (
 	manualRefresh       = make(chan struct{})
 )
 
-//goland:noinspection GoUnusedFunction
 func main() {
 	flag.Parse()
 
