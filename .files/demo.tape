@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Amolith <amolith@secluded.site>
+#
+# SPDX-License-Identifier: CC0-1.0
+
 Output screenshots/demo.webm
 Require go
 Require echo
