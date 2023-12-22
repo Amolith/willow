@@ -63,18 +63,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("Verifying database schema")
-	err = db.VerifySchema(dbConn)
+	fmt.Println("Checking whether database needs initialising")
+	err = db.InitialiseDatabase(dbConn)
 	if err != nil {
-		fmt.Println("Error verifying database schema:", err)
-		fmt.Println("Attempting to load schema")
-		err = db.LoadSchema(dbConn)
-		if err != nil {
-			fmt.Println("Error loading schema:", err)
-			os.Exit(1)
-		}
+		fmt.Println("Error initialising database:", err)
+		os.Exit(1)
 	}
-	fmt.Println("Database schema verified")
+	fmt.Println("Checking whether there are pending migrations")
+	err = db.Migrate(dbConn)
+	if err != nil {
+		fmt.Println("Error migrating database schema:", err)
+		os.Exit(1)
+	}
 
 	if len(*flagAddUser) > 0 && len(*flagDeleteUser) == 0 && !*flagListUsers && len(*flagCheckAuthorised) == 0 {
 		createUser(dbConn, *flagAddUser)

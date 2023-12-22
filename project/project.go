@@ -29,6 +29,7 @@ type Project struct {
 }
 
 type Release struct {
+	ID      string
 	URL     string
 	Tag     string
 	Content string
@@ -70,6 +71,7 @@ func fetchReleases(dbConn *sql.DB, p Project) (Project, error) {
 		}
 		for _, release := range rssReleases {
 			p.Releases = append(p.Releases, Release{
+				ID:      genReleaseID(p.URL, release.URL, release.Tag),
 				Tag:     release.Tag,
 				Content: release.Content,
 				URL:     release.URL,
@@ -88,6 +90,7 @@ func fetchReleases(dbConn *sql.DB, p Project) (Project, error) {
 		}
 		for _, release := range gitReleases {
 			p.Releases = append(p.Releases, Release{
+				ID:      genReleaseID(p.URL, release.URL, release.Tag),
 				Tag:     release.Tag,
 				Content: release.Content,
 				URL:     release.URL,
