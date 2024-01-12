@@ -5,11 +5,35 @@
  */
 
 @font-face {
-    font-family: 'Inter';
-    font-weight: 100 900;
-    font-display: swap;
-    font-style: oblique 0deg 10deg;
-    src: url("/static/inter.woff2?v=3.19") format("woff2");
+	font-family: 'Atkinson Hyperlegible';
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+	src: url("/static/fonts/regular-102a.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: 'Atkinson Hyperlegible';
+	font-weight: normal;
+	font-style: italic;
+	font-display: swap;
+	src: url("/static/fonts/regular-102a.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: 'Atkinson Hyperlegible';
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+	src: url("/static/fonts/bold-102a.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: 'Atkinson Hyperlegible';
+	font-weight: bold;
+	font-style: italic;
+	font-display: swap;
+	src: url("/static/fonts/bolditalic-102a.woff2") format("woff2");
 }
 
 html {
@@ -17,7 +41,7 @@ html {
     margin: auto auto;
     color: #2f2f2f;
     background: white;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
     padding-bottom: 20px;
 }
 
