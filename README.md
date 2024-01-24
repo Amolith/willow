@@ -100,6 +100,7 @@ section._
 
 ``` shell
 git config sendemail.to "~amolith/willow@lists.sr.ht"
+git config format.subjectPrefix "PATCH willow"
 git send-email [HASH]
 ```
 
