@@ -201,7 +201,7 @@ func stringifyRepo(url string) (path string, err error) {
 	if ep.Protocol == "http" || ep.Protocol == "https" {
 		return "data/" + strings.Split(url, "://")[1], nil
 	} else if ep.Protocol == "ssh" {
-		return "data/" + ep.Host + ep.Path, nil
+		return "data/" + ep.Host + "/" + ep.Path, nil
 	} else {
 		return "", errors.New("unsupported protocol")
 	}
