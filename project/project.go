@@ -11,6 +11,7 @@ import (
 	"log"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/unascribed/FlexVer/go/flexver"
@@ -21,6 +22,7 @@ import (
 )
 
 type Project struct {
+	ID       string
 	URL      string
 	Name     string
 	Forge    string
@@ -29,26 +31,28 @@ type Project struct {
 }
 
 type Release struct {
-	ID      string
-	URL     string
-	Tag     string
-	Content string
-	Date    time.Time
+	ID        string
+	ProjectID string
+	URL       string
+	Tag       string
+	Content   string
+	Date      time.Time
 }
 
 // GetReleases returns a list of all releases for a project from the database
-func GetReleases(dbConn *sql.DB, proj Project) (Project, error) {
-	ret, err := db.GetReleases(dbConn, proj.URL)
+func GetReleases(dbConn *sql.DB, mu *sync.Mutex, proj Project) (Project, error) {
+	ret, err := db.GetReleases(dbConn, proj.ID)
 	if err != nil {
 		return proj, err
 	}
 
 	if len(ret) == 0 {
-		return fetchReleases(dbConn, proj)
+		return fetchReleases(dbConn, mu, proj)
 	}
 
 	for _, row := range ret {
 		proj.Releases = append(proj.Releases, Release{
+			ID:      row["id"],
 			Tag:     row["tag"],
 			Content: row["content"],
 			URL:     row["release_url"],
@@ -60,7 +64,7 @@ func GetReleases(dbConn *sql.DB, proj Project) (Project, error) {
 }
 
 // fetchReleases fetches releases from a project's forge given its URI
-func fetchReleases(dbConn *sql.DB, p Project) (Project, error) {
+func fetchReleases(dbConn *sql.DB, mu *sync.Mutex, p Project) (Project, error) {
 	var err error
 	switch p.Forge {
 	case "github", "gitea", "forgejo":
@@ -71,13 +75,13 @@ func fetchReleases(dbConn *sql.DB, p Project) (Project, error) {
 		}
 		for _, release := range rssReleases {
 			p.Releases = append(p.Releases, Release{
-				ID:      genReleaseID(p.URL, release.URL, release.Tag),
+				ID:      GenReleaseID(p.URL, release.URL, release.Tag),
 				Tag:     release.Tag,
 				Content: release.Content,
 				URL:     release.URL,
 				Date:    release.Date,
 			})
-			err = upsert(dbConn, p.URL, p.Releases)
+			err = upsertRelease(dbConn, mu, p.URL, p.Releases)
 			if err != nil {
 				log.Printf("Error upserting release: %v", err)
 				return p, err
@@ -90,13 +94,13 @@ func fetchReleases(dbConn *sql.DB, p Project) (Project, error) {
 		}
 		for _, release := range gitReleases {
 			p.Releases = append(p.Releases, Release{
-				ID:      genReleaseID(p.URL, release.URL, release.Tag),
+				ID:      GenReleaseID(p.URL, release.URL, release.Tag),
 				Tag:     release.Tag,
 				Content: release.Content,
 				URL:     release.URL,
 				Date:    release.Date,
 			})
-			err = upsert(dbConn, p.URL, p.Releases)
+			err = upsertRelease(dbConn, mu, p.URL, p.Releases)
 			if err != nil {
 				log.Printf("Error upserting release: %v", err)
 				return p, err
@@ -114,12 +118,12 @@ func SortReleases(releases []Release) []Release {
 	return releases
 }
 
-// upsert updates or inserts a project release into the database
-func upsert(dbConn *sql.DB, url string, releases []Release) error {
+// upsertRelease updates or inserts a release in the database
+func upsertRelease(dbConn *sql.DB, mu *sync.Mutex, url string, releases []Release) error {
 	for _, release := range releases {
 		date := release.Date.Format("2006-01-02 15:04:05")
-		id := genReleaseID(url, release.URL, release.Tag)
-		err := db.UpsertRelease(dbConn, id, url, release.URL, release.Tag, release.Content, date)
+		id := GenReleaseID(url, release.URL, release.Tag)
+		err := db.UpsertRelease(dbConn, mu, id, url, release.URL, release.Tag, release.Content, date)
 		if err != nil {
 			log.Printf("Error upserting release: %v", err)
 			return err
@@ -128,34 +132,40 @@ func upsert(dbConn *sql.DB, url string, releases []Release) error {
 	return nil
 }
 
-func genReleaseID(projectURL, releaseURL, tag string) string {
+// GenReleaseID generates a likely-unique ID from its project's URL, its release's URL, and its tag
+func GenReleaseID(projectURL, releaseURL, tag string) string {
 	idByte := sha256.Sum256([]byte(projectURL + releaseURL + tag))
 	return fmt.Sprintf("%x", idByte)
 }
 
-func Track(dbConn *sql.DB, manualRefresh *chan struct{}, name, url, forge, release string) {
-	err := db.UpsertProject(dbConn, url, name, forge, release)
+// GenProjectID generates a likely-unique ID from a project's URI, name, and forge
+func GenProjectID(url, name, forge string) string {
+	idByte := sha256.Sum256([]byte(url + name + forge))
+	return fmt.Sprintf("%x", idByte)
+}
+
+func Track(dbConn *sql.DB, mu *sync.Mutex, manualRefresh *chan struct{}, name, url, forge, release string) {
+	id := GenProjectID(url, name, forge)
+	err := db.UpsertProject(dbConn, mu, id, url, name, forge, release)
 	if err != nil {
 		fmt.Println("Error upserting project:", err)
 	}
 	*manualRefresh <- struct{}{}
 }
 
-func Untrack(dbConn *sql.DB, manualRefresh *chan struct{}, url string) {
-	err := db.DeleteProject(dbConn, url)
+func Untrack(dbConn *sql.DB, mu *sync.Mutex, id string) {
+	err := db.DeleteProject(dbConn, mu, id)
 	if err != nil {
 		fmt.Println("Error deleting project:", err)
 	}
 
-	*manualRefresh <- struct{}{}
-
-	err = git.RemoveRepo(url)
+	err = git.RemoveRepo(id)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
-func RefreshLoop(dbConn *sql.DB, interval int, manualRefresh, req *chan struct{}, res *chan []Project) {
+func RefreshLoop(dbConn *sql.DB, mu *sync.Mutex, interval int, manualRefresh, req *chan struct{}, res *chan []Project) {
 	ticker := time.NewTicker(time.Second * time.Duration(interval))
 
 	fetch := func() []Project {
@@ -164,7 +174,7 @@ func RefreshLoop(dbConn *sql.DB, interval int, manualRefresh, req *chan struct{}
 			fmt.Println("Error getting projects:", err)
 		}
 		for i, p := range projectsList {
-			p, err := fetchReleases(dbConn, p)
+			p, err := fetchReleases(dbConn, mu, p)
 			if err != nil {
 				fmt.Println(err)
 				continue
@@ -175,7 +185,7 @@ func RefreshLoop(dbConn *sql.DB, interval int, manualRefresh, req *chan struct{}
 			return strings.ToLower(projectsList[i].Name) < strings.ToLower(projectsList[j].Name)
 		})
 		for i := range projectsList {
-			err = upsert(dbConn, projectsList[i].URL, projectsList[i].Releases)
+			err = upsertRelease(dbConn, mu, projectsList[i].URL, projectsList[i].Releases)
 			if err != nil {
 				fmt.Println("Error upserting release:", err)
 				continue
@@ -202,18 +212,29 @@ func RefreshLoop(dbConn *sql.DB, interval int, manualRefresh, req *chan struct{}
 }
 
 // GetProject returns a project from the database
-func GetProject(dbConn *sql.DB, url string) (Project, error) {
-	projectDB, err := db.GetProject(dbConn, url)
+func GetProject(dbConn *sql.DB, id string) (Project, error) {
+	projectDB, err := db.GetProject(dbConn, id)
 	if err != nil {
 		return Project{}, err
 	}
 	p := Project{
+		ID:      projectDB["id"],
 		URL:     projectDB["url"],
 		Name:    projectDB["name"],
 		Forge:   projectDB["forge"],
 		Running: projectDB["version"],
 	}
 	return p, err
+}
+
+// GetProjectWithReleases returns a single project from the database along with its releases
+func GetProjectWithReleases(dbConn *sql.DB, mu *sync.Mutex, id string) (Project, error) {
+	project, err := GetProject(dbConn, id)
+	if err != nil {
+		return Project{}, err
+	}
+
+	return GetReleases(dbConn, mu, project)
 }
 
 // GetProjects returns a list of all projects from the database
@@ -226,11 +247,31 @@ func GetProjects(dbConn *sql.DB) ([]Project, error) {
 	projects := make([]Project, len(projectsDB))
 	for i, p := range projectsDB {
 		projects[i] = Project{
+			ID:      p["id"],
 			URL:     p["url"],
 			Name:    p["name"],
 			Forge:   p["forge"],
 			Running: p["version"],
 		}
+	}
+
+	return projects, nil
+}
+
+// GetProjectsWithReleases returns a list of all projects and all their releases
+// from the database
+func GetProjectsWithReleases(dbConn *sql.DB, mu *sync.Mutex) ([]Project, error) {
+	projects, err := GetProjects(dbConn)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range projects {
+		projects[i], err = GetReleases(dbConn, mu, projects[i])
+		if err != nil {
+			return nil, err
+		}
+		projects[i].Releases = SortReleases(projects[i].Releases)
 	}
 
 	return projects, nil

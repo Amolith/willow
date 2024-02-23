@@ -7,6 +7,8 @@ package db
 import (
 	"database/sql"
 	_ "embed"
+	"errors"
+	"sync"
 
 	_ "modernc.org/sqlite"
 )
@@ -14,46 +16,25 @@ import (
 //go:embed sql/schema.sql
 var schema string
 
+var mutex = &sync.Mutex{}
+
 // Open opens a connection to the SQLite database
 func Open(dbPath string) (*sql.DB, error) {
-	return sql.Open("sqlite", dbPath)
+	return sql.Open("sqlite", "file:"+dbPath+"?_pragma=journal_mode%3DWAL")
 }
 
 // VerifySchema checks whether the schema has been initalised and initialises it
 // if not
 func InitialiseDatabase(dbConn *sql.DB) error {
 	var name string
-	err := dbConn.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_migrations'").Scan(&name)
-	if err == nil {
+	err := dbConn.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name='users'").Scan(&name)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		mutex.Lock()
+		defer mutex.Unlock()
+		if _, err := dbConn.Exec(schema); err != nil {
+			return err
+		}
 		return nil
 	}
-
-	tables := []string{
-		"users",
-		"sessions",
-		"projects",
-		"releases",
-	}
-
-	for _, table := range tables {
-		name := ""
-		err := dbConn.QueryRow(
-			"SELECT name FROM sqlite_master WHERE type='table' AND name=@table",
-			sql.Named("table", table),
-		).Scan(&name)
-		if err != nil {
-			if err = loadSchema(dbConn); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-// loadSchema loads the initial schema into the database
-func loadSchema(dbConn *sql.DB) error {
-	if _, err := dbConn.Exec(schema); err != nil {
-		return err
-	}
-	return nil
+	return err
 }

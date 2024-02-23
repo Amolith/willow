@@ -22,6 +22,10 @@ var (
 	migration1Up string
 	//go:embed sql/1_add_project_ids.down.sql
 	migration1Down string
+	//go:embed sql/2_swap_project_url_for_id.up.sql
+	migration2Up string
+	//go:embed sql/2_swap_project_url_for_id.down.sql
+	migration2Down string
 )
 
 var migrations = [...]migration{
@@ -34,6 +38,13 @@ var migrations = [...]migration{
 		upQuery:   migration1Up,
 		downQuery: migration1Down,
 		postHook:  generateAndInsertProjectIDs,
+	},
+	2: {
+		upQuery:   migration2Up,
+		downQuery: migration2Down,
+	},
+	3: {
+		postHook: correctProjectIDs,
 	},
 }
 

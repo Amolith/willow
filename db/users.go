@@ -12,12 +12,16 @@ import (
 // DeleteUser deletes specific user from the database and returns an error if it
 // fails
 func DeleteUser(db *sql.DB, user string) error {
+	mutex.Lock()
+	defer mutex.Unlock()
 	_, err := db.Exec("DELETE FROM users WHERE username = ?", user)
 	return err
 }
 
 // CreateUser creates a new user in the database and returns an error if it fails
 func CreateUser(db *sql.DB, username, hash, salt string) error {
+	mutex.Lock()
+	defer mutex.Unlock()
 	_, err := db.Exec("INSERT INTO users (username, hash, salt) VALUES (?, ?, ?)", username, hash, salt)
 	return err
 }
@@ -72,6 +76,8 @@ func GetSession(db *sql.DB, session string) (string, time.Time, error) {
 // InvalidateSession invalidates a session by setting the expiration date to the
 // provided time.
 func InvalidateSession(db *sql.DB, session string, expiry time.Time) error {
+	mutex.Lock()
+	defer mutex.Unlock()
 	_, err := db.Exec("UPDATE sessions SET expires = ? WHERE token = ?", expiry.Format(time.RFC3339), session)
 	return err
 }
@@ -79,6 +85,8 @@ func InvalidateSession(db *sql.DB, session string, expiry time.Time) error {
 // CreateSession creates a new session in the database and returns an error if
 // it fails
 func CreateSession(db *sql.DB, username, token string, expiry time.Time) error {
+	mutex.Lock()
+	defer mutex.Unlock()
 	_, err := db.Exec("INSERT INTO sessions (token, username, expires) VALUES (?, ?, ?)", token, username, expiry.Format(time.RFC3339))
 	return err
 }

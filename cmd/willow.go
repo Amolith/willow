@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 
 	"git.sr.ht/~amolith/willow/db"
 	"git.sr.ht/~amolith/willow/project"
@@ -22,9 +23,8 @@ import (
 
 type (
 	Config struct {
-		Server      server
-		CSVLocation string
-		DBConn      string
+		Server server
+		DBConn string
 		// TODO: Make cache location configurable
 		// CacheLocation string
 		FetchInterval int
@@ -90,17 +90,17 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("Starting refresh loop")
-	go project.RefreshLoop(dbConn, config.FetchInterval, &manualRefresh, &req, &res)
+	mu := sync.Mutex{}
 
-	var mutex sync.Mutex
+	fmt.Println("Starting refresh loop")
+	go project.RefreshLoop(dbConn, &mu, config.FetchInterval, &manualRefresh, &req, &res)
 
 	wsHandler := ws.Handler{
 		DbConn:        dbConn,
-		Mutex:         &mutex,
 		Req:           &req,
 		Res:           &res,
 		ManualRefresh: &manualRefresh,
+		Mu:            &mu,
 	}
 
 	mux := http.NewServeMux()

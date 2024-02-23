@@ -37,12 +37,11 @@
 }
 
 html {
-    max-width: 500px;
     margin: auto auto;
     color: #2f2f2f;
     background: white;
     font-family: 'Atkinson Hyperlegible', sans-serif;
-    padding-bottom: 20px;
+    scroll-behavior: smooth;
 }
 
 a {
@@ -53,8 +52,28 @@ a:visited {
     color: #0640e0;
 }
 
-.project {
-    max-width: 500px;
+.two_column {
+    display: flex;
+    gap: 30px;
+    flex-direction: row;
+    margin: auto auto;
+    max-width: 1000px;
+    height: 92vh;
+}
+
+.projects, .release_notes {
+    overflow: scroll;
+    flex: 0 0 500px;
+}
+
+.release_note.card:not(:target) { display: none;  }
+.release_note.card:target       { display: block; }
+
+.return_to_project {
+    display: none;
+}
+
+.card {
     border: 2px solid #2f2f2f;
     background: #f8f8f8;
     border-radius: 5px;
@@ -63,34 +82,35 @@ a:visited {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
-.project > h2 {
+.card > h3 {
     margin-top: 0;
 }
 
-.project > p:first-of-type {
+.card > p:first-of-type {
     margin-bottom: 16px;
 }
 
-.project > h2 > span {
+.card > p:last-of-type {
+    margin-bottom: 16px;
+}
+
+.close, .delete { float: right; }
+.delete { font-size: 12px; }
+.close > a {
+    text-decoration: none;
+    color: #2f2f2f;
+}
+
+.card > pre, .card > div > pre { overflow: scroll; }
+
+.wrapper {
+    max-width: 500px;
+    margin: auto auto;
+}
+
+header > h1 > span {
     font-size: 12px;
     float: right;
-}
-
-body > h1 > span {
-    font-size: 12px;
-    float: right;
-}
-
-.project > details > pre {
-    overflow: scroll;
-}
-
-summary {
-    cursor: pointer;
-}
-
-details summary > * {
-    display: inline;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -107,8 +127,36 @@ details summary > * {
         color: #5582ff;
     }
 
-    .project {
+    .card {
         border: 2px solid #ccc;
         background: #1c1c1c;
     }
+
+    .close > a {
+        color: #ccc;
+    }
 }
+
+@media only screen and (max-width: 1000px) {
+    div[id] {
+        display: block;
+    }
+
+    .two_column {
+        flex-direction: column;
+    }
+
+    .projects, .release_notes {
+        overflow: visible;
+        flex: 0 0 100%;
+    }
+
+    .return_to_project {
+        display: block;
+    }
+
+    .close {
+        display: none;
+    }
+}
+

@@ -4,32 +4,32 @@
 
 package db
 
-import "database/sql"
-
-// CreateProject adds a project to the database
-func CreateProject(db *sql.DB, url, name, forge, running string) error {
-	_, err := db.Exec("INSERT INTO projects (url, name, forge, version) VALUES (?, ?, ?, ?)", url, name, forge, running)
-	return err
-}
+import (
+	"database/sql"
+	"sync"
+)
 
 // DeleteProject deletes a project from the database
-func DeleteProject(db *sql.DB, url string) error {
-	_, err := db.Exec("DELETE FROM projects WHERE url = ?", url)
+func DeleteProject(db *sql.DB, mu *sync.Mutex, id string) error {
+	mu.Lock()
+	defer mu.Unlock()
+	_, err := db.Exec("DELETE FROM projects WHERE id = ?", id)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("DELETE FROM releases WHERE project_url = ?", url)
+	_, err = db.Exec("DELETE FROM releases WHERE project_id = ?", id)
 	return err
 }
 
 // GetProject returns a project from the database
 func GetProject(db *sql.DB, url string) (map[string]string, error) {
-	var name, forge, version string
-	err := db.QueryRow("SELECT name, forge, version FROM projects WHERE url = ?", url).Scan(&name, &forge, &version)
+	var id, name, forge, version string
+	err := db.QueryRow("SELECT id, name, forge, version FROM projects WHERE url = ?", url).Scan(&id, &name, &forge, &version)
 	if err != nil {
 		return nil, err
 	}
 	project := map[string]string{
+		"id":      id,
 		"name":    name,
 		"url":     url,
 		"forge":   forge,
@@ -38,27 +38,23 @@ func GetProject(db *sql.DB, url string) (map[string]string, error) {
 	return project, nil
 }
 
-// UpdateProject updates an existing project in the database
-func UpdateProject(db *sql.DB, url, name, forge, running string) error {
-	_, err := db.Exec("UPDATE projects SET name=?, forge=?, version=? WHERE url=?", name, forge, running, url)
-	return err
-}
-
 // UpsertProject adds or updates a project in the database
-func UpsertProject(db *sql.DB, url, name, forge, running string) error {
-	_, err := db.Exec(`INSERT INTO projects (url, name, forge, version)
-		VALUES (?, ?, ?, ?)
-		ON CONFLICT(url) DO 
+func UpsertProject(db *sql.DB, mu *sync.Mutex, id, url, name, forge, running string) error {
+	mu.Lock()
+	defer mu.Unlock()
+	_, err := db.Exec(`INSERT INTO projects (id, url, name, forge, version)
+		VALUES (?, ?, ?, ?, ?)
+		ON CONFLICT(id) DO 
 			UPDATE SET
 				name = excluded.name,
 				forge = excluded.forge,
-				version = excluded.version;`, url, name, forge, running)
+				version = excluded.version;`, id, url, name, forge, running)
 	return err
 }
 
 // GetProjects returns a list of all projects in the database
 func GetProjects(db *sql.DB) ([]map[string]string, error) {
-	rows, err := db.Query("SELECT name, url, forge, version FROM projects")
+	rows, err := db.Query("SELECT id, name, url, forge, version FROM projects")
 	if err != nil {
 		return nil, err
 	}
@@ -66,12 +62,13 @@ func GetProjects(db *sql.DB) ([]map[string]string, error) {
 
 	var projects []map[string]string
 	for rows.Next() {
-		var name, url, forge, version string
-		err = rows.Scan(&name, &url, &forge, &version)
+		var id, name, url, forge, version string
+		err = rows.Scan(&id, &name, &url, &forge, &version)
 		if err != nil {
 			return nil, err
 		}
 		project := map[string]string{
+			"id":      id,
 			"name":    name,
 			"url":     url,
 			"forge":   forge,

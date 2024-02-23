@@ -55,3 +55,35 @@ func generateAndInsertProjectIDs(tx *sql.Tx) error {
 
 	return nil
 }
+
+// Basing the project's ID on when it was created (L37) was a bad idea.
+func correctProjectIDs(tx *sql.Tx) error {
+	rows, err := tx.Query("SELECT id, url, name, forge FROM projects")
+	if err != nil {
+		return fmt.Errorf("failed to list projects in projects_tmp: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			old_id string
+			url    string
+			name   string
+			forge  string
+		)
+		if err := rows.Scan(&old_id, &url, &name, &forge); err != nil {
+			return fmt.Errorf("failed to scan row from projects_tmp: %w", err)
+		}
+		id := fmt.Sprintf("%x", sha256.Sum256([]byte(url+name+forge)))
+		_, err = tx.Exec(
+			"UPDATE projects SET id = @id WHERE id = @old_id",
+			sql.Named("id", id),
+			sql.Named("old_id", old_id),
+		)
+		if err != nil {
+			return fmt.Errorf("failed to insert project into projects: %w", err)
+		}
+	}
+
+	return nil
+}

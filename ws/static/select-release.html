@@ -17,7 +17,7 @@
         <link rel="preload" href="/static/styles.css" as="style" />
         <link rel="stylesheet" href="/static/styles.css" />
     </head>
-    <body>
+    <body class="wrapper">
         <h1>Willow</h1>
         <form method="post">
             <div class="input">
@@ -31,9 +31,9 @@
                 <label for="{{ .Tag }}"><a href="{{ .URL }}">{{ .Tag }}</a></label><br>
                 {{- else -}}
                 {{- if eq $forge "sourcehut" -}}
-                <label for="{{ .Tag }}"><a href="{{ $url }}/refs/{{ .Tag }}">{{ .Tag }}</label><br>
+                <label for="{{ .Tag }}"><a href="{{ $url }}/refs/{{ .Tag }}">{{ .Tag }}</a></label><br>
                 {{- else if eq $forge "gitlab" -}}
-                <label for="{{ .Tag }}"><a href="{{ $url }}/-releases/{{ .Tag }}">{{ .Tag }}</label><br>
+                <label for="{{ .Tag }}"><a href="{{ $url }}/-releases/{{ .Tag }}">{{ .Tag }}</a></label><br>
                 {{- else -}}
                 <label for="{{ .Tag }}">{{ .Tag }}</label><br>
                 {{- end -}}
@@ -43,6 +43,7 @@
             <input type="hidden" name="url" value="{{ .URL }}">
             <input type="hidden" name="name" value="{{ .Name }}">
             <input type="hidden" name="forge" value="{{ .Forge }}">
+            <input type="hidden" name="id" value="{{ .ID }}">
             <input class="button" type="submit" formaction="/new" value="Track future releases">
         </form>
         <!-- Append these if they ever start limiting RSS entries: `(eq $forge "gitea") (eq $forge "forgejo")` -->

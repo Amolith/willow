@@ -6,34 +6,29 @@ package db
 
 import (
 	"database/sql"
+	"sync"
 )
-
-// AddRelease adds a release for a project with a given URL to the database
-
-// DeleteRelease deletes a release for a project with a given URL from the database
-
-// UpdateRelease updates a release for a project with a given URL in the database
 
 // UpsertRelease adds or updates a release for a project with a given URL in the
 // database
-func UpsertRelease(db *sql.DB, id, projectURL, releaseURL, tag, content, date string) error {
-	_, err := db.Exec(`INSERT INTO releases (id, project_url, release_url, tag, content, date)
+func UpsertRelease(db *sql.DB, mu *sync.Mutex, id, projectID, url, tag, content, date string) error {
+	mu.Lock()
+	defer mu.Unlock()
+	_, err := db.Exec(`INSERT INTO releases (id, project_id, url, tag, content, date)
 		VALUES (?, ?, ?, ?, ?, ?)
 		ON CONFLICT(id) DO 
 			UPDATE SET
-				release_url = excluded.release_url,
+				url = excluded.url,
 				content = excluded.content,
 				tag = excluded.tag,
 				content = excluded.content,
-				date = excluded.date;`, id, projectURL, releaseURL, tag, content, date)
+				date = excluded.date;`, id, projectID, url, tag, content, date)
 	return err
 }
 
-// GetRelease returns a release for a project with a given URL from the database
-
-// GetReleases returns all releases for a project with a given URL from the database
-func GetReleases(db *sql.DB, projectURL string) ([]map[string]string, error) {
-	rows, err := db.Query(`SELECT project_url, release_url, tag, content, date FROM releases WHERE project_url = ?`, projectURL)
+// GetReleases returns all releases for a project with a given id from the database
+func GetReleases(db *sql.DB, projectID string) ([]map[string]string, error) {
+	rows, err := db.Query(`SELECT id, url, tag, content, date FROM releases WHERE project_id = ?`, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -42,22 +37,22 @@ func GetReleases(db *sql.DB, projectURL string) ([]map[string]string, error) {
 	releases := make([]map[string]string, 0)
 	for rows.Next() {
 		var (
-			projectURL string
-			releaseURL string
-			tag        string
-			content    string
-			date       string
+			id      string
+			url     string
+			tag     string
+			content string
+			date    string
 		)
-		err := rows.Scan(&projectURL, &releaseURL, &tag, &content, &date)
+		err := rows.Scan(&id, &url, &tag, &content, &date)
 		if err != nil {
 			return nil, err
 		}
 		releases = append(releases, map[string]string{
-			"projectURL": projectURL,
-			"releaseURL": releaseURL,
-			"tag":        tag,
-			"content":    content,
-			"date":       date,
+			"id":      id,
+			"url":     url,
+			"tag":     tag,
+			"content": content,
+			"date":    date,
 		})
 	}
 	return releases, nil

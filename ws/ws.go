@@ -16,18 +16,17 @@ import (
 	"text/template"
 	"time"
 
-	"git.sr.ht/~amolith/willow/users"
-
 	"git.sr.ht/~amolith/willow/project"
+	"git.sr.ht/~amolith/willow/users"
 	"github.com/microcosm-cc/bluemonday"
 )
 
 type Handler struct {
 	DbConn        *sql.DB
-	Mutex         *sync.Mutex
 	Req           *chan struct{}
 	ManualRefresh *chan struct{}
 	Res           *chan []project.Project
+	Mu            *sync.Mutex
 }
 
 //go:embed static
@@ -41,8 +40,16 @@ func (h Handler) RootHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-	*h.Req <- struct{}{}
-	data := <-*h.Res
+	data, err := project.GetProjectsWithReleases(h.DbConn, h.Mu)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		_, err := w.Write([]byte("Internal Server Error"))
+		if err != nil {
+			fmt.Println(err)
+		}
+		return
+	}
 	tmpl := template.Must(template.ParseFS(fs, "static/home.html"))
 	if err := tmpl.Execute(w, data); err != nil {
 		fmt.Println(err)
@@ -114,7 +121,8 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 
 			}
 
-			proj, err = project.GetReleases(h.DbConn, proj)
+			proj.ID = project.GenProjectID(proj.URL, proj.Name, proj.Forge)
+			proj, err = project.GetReleases(h.DbConn, h.Mu, proj)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				_, err := w.Write([]byte(fmt.Sprintf("Error getting releases: %s", err)))
@@ -129,8 +137,8 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err)
 			}
 		} else if action == "delete" {
-			submittedURL := params.Get("url")
-			if submittedURL == "" {
+			submittedID := params.Get("id")
+			if submittedID == "" {
 				w.WriteHeader(http.StatusBadRequest)
 				_, err := w.Write([]byte("No URL provided"))
 				if err != nil {
@@ -139,7 +147,7 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			project.Untrack(h.DbConn, h.ManualRefresh, submittedURL)
+			project.Untrack(h.DbConn, h.Mu, submittedID)
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 		}
 	}
@@ -149,28 +157,29 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println(err)
 		}
+		idValue := bmStrict.Sanitize(r.FormValue("id"))
 		nameValue := bmStrict.Sanitize(r.FormValue("name"))
 		urlValue := bmStrict.Sanitize(r.FormValue("url"))
 		forgeValue := bmStrict.Sanitize(r.FormValue("forge"))
 		releaseValue := bmStrict.Sanitize(r.FormValue("release"))
 
-		if nameValue != "" && urlValue != "" && forgeValue != "" && releaseValue != "" {
-			project.Track(h.DbConn, h.ManualRefresh, nameValue, urlValue, forgeValue, releaseValue)
+		// If releaseValue is not empty, we're updating an existing project
+		if idValue != "" && nameValue != "" && urlValue != "" && forgeValue != "" && releaseValue != "" {
+			project.Track(h.DbConn, h.Mu, h.ManualRefresh, nameValue, urlValue, forgeValue, releaseValue)
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 
-		if nameValue != "" && urlValue != "" && forgeValue != "" && releaseValue == "" {
+		// If releaseValue is empty, we're creating a new project
+		if idValue == "" && nameValue != "" && urlValue != "" && forgeValue != "" && releaseValue == "" {
 			http.Redirect(w, r, "/new?action=yoink&name="+url.QueryEscape(nameValue)+"&url="+url.QueryEscape(urlValue)+"&forge="+url.QueryEscape(forgeValue), http.StatusSeeOther)
 			return
 		}
 
-		if nameValue == "" && urlValue == "" && forgeValue == "" && releaseValue == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			_, err := w.Write([]byte("No data provided"))
-			if err != nil {
-				fmt.Println(err)
-			}
+		w.WriteHeader(http.StatusBadRequest)
+		_, err = w.Write([]byte("No data provided"))
+		if err != nil {
+			fmt.Println(err)
 		}
 	}
 }
