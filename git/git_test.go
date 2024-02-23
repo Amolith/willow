@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Amolith <amolith@secluded.site>
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package git
 
 import (
