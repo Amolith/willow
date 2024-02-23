@@ -190,6 +190,9 @@ func dirEmpty(name string) (empty bool, err error) {
 // stringifyRepo accepts a repository URI string and the corresponding local
 // filesystem path, whether the URI is HTTP, HTTPS, or SSH.
 func stringifyRepo(url string) (path string, err error) {
+	url = strings.TrimSuffix(url, ".git")
+	url = strings.TrimSuffix(url, "/")
+
 	ep, err := transport.NewEndpoint(url)
 	if err != nil {
 		return "", err
