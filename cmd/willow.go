@@ -10,7 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sync"
+	"strconv"
 
 	"git.sr.ht/~amolith/willow/db"
 	"git.sr.ht/~amolith/willow/project"
@@ -126,6 +126,20 @@ func main() {
 }
 
 func checkConfig() error {
+	defaultDBConn := "willow.sqlite"
+	defaultFetchInterval := 3600
+	defaultListen := "127.0.0.1:1313"
+
+	defaultConfig := fmt.Sprintf(`# Path to SQLite database
+DBConn = "%s"
+# How often to fetch new releases in seconds
+## Minimum is %ds to avoid rate limits and unintentional abuse
+FetchInterval = %d
+
+[Server]
+# Address to listen on
+Listen = "%s"`, defaultDBConn, defaultFetchInterval, defaultFetchInterval, defaultListen)
+
 	file, err := os.Open(*flagConfig)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -135,15 +149,7 @@ func checkConfig() error {
 			}
 			defer file.Close()
 
-			_, err = file.WriteString(`# Path to SQLite database
-DBConn = "willow.sqlite"
-# How often to fetch new releases in seconds
-FetchInterval = 3600
-
-[Server]
-# Address to listen on
-Listen = "127.0.0.1:1313"
-				`)
+			_, err = file.WriteString(defaultConfig)
 			if err != nil {
 				return err
 			}
@@ -162,19 +168,19 @@ Listen = "127.0.0.1:1313"
 		return err
 	}
 
-	if config.FetchInterval < 10 {
-		fmt.Println("Fetch interval is set to", config.FetchInterval, "seconds, but the minimum is 10, using 10")
-		config.FetchInterval = 10
+	if config.FetchInterval < defaultFetchInterval {
+		fmt.Println("Fetch interval is set to", strconv.Itoa(config.FetchInterval), "seconds, but the minimum is", defaultFetchInterval, "seconds, using", strconv.Itoa(defaultFetchInterval)+"s")
+		config.FetchInterval = defaultFetchInterval
 	}
 
 	if config.Server.Listen == "" {
-		fmt.Println("No listen address specified, using 127.0.0.1:1313")
-		config.Server.Listen = "127.0.0.1:1313"
+		fmt.Println("No listen address specified, using", defaultListen)
+		config.Server.Listen = defaultListen
 	}
 
 	if config.DBConn == "" {
-		fmt.Println("No SQLite path specified, using \"willow.sqlite\"")
-		config.DBConn = "willow.sqlite"
+		fmt.Println("No SQLite path specified, using \"" + defaultDBConn + "\"")
+		config.DBConn = defaultDBConn
 	}
 
 	return nil
