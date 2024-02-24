@@ -130,6 +130,13 @@ func SortReleases(releases []Release) []Release {
 	return releases
 }
 
+func SortProjects(projects []Project) []Project {
+	sort.Slice(projects, func(i, j int) bool {
+		return strings.ToLower(projects[i].Name) < strings.ToLower(projects[j].Name)
+	})
+	return projects
+}
+
 // upsertReleases updates or inserts a release in the database
 func upsertReleases(dbConn *sql.DB, mu *sync.Mutex, projID string, releases []Release) error {
 	for _, release := range releases {
@@ -268,7 +275,7 @@ func GetProjects(dbConn *sql.DB) ([]Project, error) {
 		}
 	}
 
-	return projects, nil
+	return SortProjects(projects), nil
 }
 
 // GetProjectsWithReleases returns a list of all projects and all their releases
@@ -287,5 +294,5 @@ func GetProjectsWithReleases(dbConn *sql.DB, mu *sync.Mutex) ([]Project, error) 
 		projects[i].Releases = SortReleases(projects[i].Releases)
 	}
 
-	return projects, nil
+	return SortProjects(projects), nil
 }
