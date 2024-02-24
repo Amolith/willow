@@ -116,7 +116,7 @@ header > h1 > span {
 @media (prefers-color-scheme: dark) {
     html {
         background: #171717;
-        color: #ccc;
+        color: #424242;
     }
 
     a {
