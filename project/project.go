@@ -7,6 +7,7 @@ package project
 import (
 	"crypto/sha256"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"sort"
@@ -41,22 +42,33 @@ type Release struct {
 
 // GetReleases returns a list of all releases for a project from the database
 func GetReleases(dbConn *sql.DB, mu *sync.Mutex, proj Project) (Project, error) {
+	proj.ID = GenProjectID(proj.URL, proj.Name, proj.Forge)
+
 	ret, err := db.GetReleases(dbConn, proj.ID)
 	if err != nil {
 		return proj, err
 	}
 
 	if len(ret) == 0 {
-		return fetchReleases(dbConn, mu, proj)
+		proj, err = fetchReleases(dbConn, mu, proj)
+		if err != nil {
+			return proj, err
+		}
+		err = upsertReleases(dbConn, mu, proj.ID, proj.Releases)
+		if err != nil {
+			return proj, err
+		}
+		return proj, nil
 	}
 
 	for _, row := range ret {
 		proj.Releases = append(proj.Releases, Release{
-			ID:      row["id"],
-			Tag:     row["tag"],
-			Content: row["content"],
-			URL:     row["release_url"],
-			Date:    time.Time{},
+			ID:        row["id"],
+			ProjectID: proj.ID,
+			Tag:       row["tag"],
+			Content:   row["content"],
+			URL:       row["release_url"],
+			Date:      time.Time{},
 		})
 	}
 	proj.Releases = SortReleases(proj.Releases)
@@ -81,7 +93,7 @@ func fetchReleases(dbConn *sql.DB, mu *sync.Mutex, p Project) (Project, error) {
 				URL:     release.URL,
 				Date:    release.Date,
 			})
-			err = upsertRelease(dbConn, mu, p.URL, p.Releases)
+			err = upsertReleases(dbConn, mu, p.ID, p.Releases)
 			if err != nil {
 				log.Printf("Error upserting release: %v", err)
 				return p, err
@@ -100,7 +112,7 @@ func fetchReleases(dbConn *sql.DB, mu *sync.Mutex, p Project) (Project, error) {
 				URL:     release.URL,
 				Date:    release.Date,
 			})
-			err = upsertRelease(dbConn, mu, p.URL, p.Releases)
+			err = upsertReleases(dbConn, mu, p.ID, p.Releases)
 			if err != nil {
 				log.Printf("Error upserting release: %v", err)
 				return p, err
@@ -118,12 +130,11 @@ func SortReleases(releases []Release) []Release {
 	return releases
 }
 
-// upsertRelease updates or inserts a release in the database
-func upsertRelease(dbConn *sql.DB, mu *sync.Mutex, url string, releases []Release) error {
+// upsertReleases updates or inserts a release in the database
+func upsertReleases(dbConn *sql.DB, mu *sync.Mutex, projID string, releases []Release) error {
 	for _, release := range releases {
 		date := release.Date.Format("2006-01-02 15:04:05")
-		id := GenReleaseID(url, release.URL, release.Tag)
-		err := db.UpsertRelease(dbConn, mu, id, url, release.URL, release.Tag, release.Content, date)
+		err := db.UpsertRelease(dbConn, mu, release.ID, projID, release.URL, release.Tag, release.Content, date)
 		if err != nil {
 			log.Printf("Error upserting release: %v", err)
 			return err
@@ -185,7 +196,7 @@ func RefreshLoop(dbConn *sql.DB, mu *sync.Mutex, interval int, manualRefresh, re
 			return strings.ToLower(projectsList[i].Name) < strings.ToLower(projectsList[j].Name)
 		})
 		for i := range projectsList {
-			err = upsertRelease(dbConn, mu, projectsList[i].URL, projectsList[i].Releases)
+			err = upsertReleases(dbConn, mu, projectsList[i].ID, projectsList[i].Releases)
 			if err != nil {
 				fmt.Println("Error upserting release:", err)
 				continue
@@ -212,24 +223,26 @@ func RefreshLoop(dbConn *sql.DB, mu *sync.Mutex, interval int, manualRefresh, re
 }
 
 // GetProject returns a project from the database
-func GetProject(dbConn *sql.DB, id string) (Project, error) {
-	projectDB, err := db.GetProject(dbConn, id)
-	if err != nil {
-		return Project{}, err
+func GetProject(dbConn *sql.DB, proj Project) (Project, error) {
+	projectDB, err := db.GetProject(dbConn, proj.ID)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		return proj, nil
+	} else if err != nil {
+		return proj, err
 	}
 	p := Project{
-		ID:      projectDB["id"],
-		URL:     projectDB["url"],
-		Name:    projectDB["name"],
-		Forge:   projectDB["forge"],
+		ID:      proj.ID,
+		URL:     proj.URL,
+		Name:    proj.Name,
+		Forge:   proj.Forge,
 		Running: projectDB["version"],
 	}
 	return p, err
 }
 
 // GetProjectWithReleases returns a single project from the database along with its releases
-func GetProjectWithReleases(dbConn *sql.DB, mu *sync.Mutex, id string) (Project, error) {
-	project, err := GetProject(dbConn, id)
+func GetProjectWithReleases(dbConn *sql.DB, mu *sync.Mutex, proj Project) (Project, error) {
+	project, err := GetProject(dbConn, proj)
 	if err != nil {
 		return Project{}, err
 	}

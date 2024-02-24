@@ -22,9 +22,9 @@ func DeleteProject(db *sql.DB, mu *sync.Mutex, id string) error {
 }
 
 // GetProject returns a project from the database
-func GetProject(db *sql.DB, url string) (map[string]string, error) {
-	var id, name, forge, version string
-	err := db.QueryRow("SELECT id, name, forge, version FROM projects WHERE url = ?", url).Scan(&id, &name, &forge, &version)
+func GetProject(db *sql.DB, id string) (map[string]string, error) {
+	var name, forge, url, version string
+	err := db.QueryRow("SELECT name, forge, url, version FROM projects WHERE id = ?", id).Scan(&name, &forge, &url, &version)
 	if err != nil {
 		return nil, err
 	}

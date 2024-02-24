@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-// UpsertRelease adds or updates a release for a project with a given URL in the
+// UpsertRelease adds or updates a release for a project with a given ID in the
 // database
 func UpsertRelease(db *sql.DB, mu *sync.Mutex, id, projectID, url, tag, content, date string) error {
 	mu.Lock()
@@ -48,11 +48,12 @@ func GetReleases(db *sql.DB, projectID string) ([]map[string]string, error) {
 			return nil, err
 		}
 		releases = append(releases, map[string]string{
-			"id":      id,
-			"url":     url,
-			"tag":     tag,
-			"content": content,
-			"date":    date,
+			"id":         id,
+			"project_id": projectID,
+			"url":        url,
+			"tag":        tag,
+			"content":    content,
+			"date":       date,
 		})
 	}
 	return releases, nil

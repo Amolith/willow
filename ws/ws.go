@@ -80,7 +80,34 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			proj, err := project.GetProject(h.DbConn, submittedURL)
+			forge := bmStrict.Sanitize(params.Get("forge"))
+			if forge == "" {
+				w.WriteHeader(http.StatusBadRequest)
+				_, err := w.Write([]byte("No forge provided"))
+				if err != nil {
+					fmt.Println(err)
+				}
+				return
+			}
+
+			name := bmStrict.Sanitize(params.Get("name"))
+			if name == "" {
+				w.WriteHeader(http.StatusBadRequest)
+				_, err := w.Write([]byte("No name provided"))
+				if err != nil {
+					fmt.Println(err)
+				}
+				return
+			}
+
+			proj := project.Project{
+				ID:    project.GenProjectID(submittedURL, name, forge),
+				URL:   submittedURL,
+				Name:  name,
+				Forge: forge,
+			}
+
+			proj, err := project.GetProject(h.DbConn, proj)
 			if err != nil && err != sql.ErrNoRows {
 				w.WriteHeader(http.StatusBadRequest)
 				_, err := w.Write([]byte(fmt.Sprintf("Error getting project: %s", err)))
@@ -90,38 +117,6 @@ func (h Handler) NewHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if proj.Running == "" {
-				forge := bmStrict.Sanitize(params.Get("forge"))
-				if forge == "" {
-					w.WriteHeader(http.StatusBadRequest)
-					_, err := w.Write([]byte("No forge provided"))
-					if err != nil {
-						fmt.Println(err)
-					}
-					return
-				}
-
-				name := bmStrict.Sanitize(params.Get("name"))
-				if name == "" {
-					w.WriteHeader(http.StatusBadRequest)
-					_, err := w.Write([]byte("No name provided"))
-					if err != nil {
-						fmt.Println(err)
-					}
-					return
-				}
-
-				proj = project.Project{
-					URL:   submittedURL,
-					Name:  name,
-					Forge: forge,
-				}
-
-				proj.URL = strings.TrimSuffix(proj.URL, ".git")
-
-			}
-
-			proj.ID = project.GenProjectID(proj.URL, proj.Name, proj.Forge)
 			proj, err = project.GetReleases(h.DbConn, h.Mu, proj)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
