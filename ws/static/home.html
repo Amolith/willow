@@ -33,7 +33,7 @@
                 {{- end -}}
                 {{- range . -}}
                 {{- if ne .Running (index .Releases 0).Tag -}}
-                <div class="project card">
+                <div id="{{ .ID }}" class="project card">
                     <h3><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span class="delete"><a href="/new?action=delete&url={{ .URL }}">Delete?</a></span></h3>
                     <p>You've selected {{ .Running }}. <a href="/new?action=update&url={{ .URL }}&forge={{ .Forge }}&name={{ .Name }}">Modify?</a></p>
                     <p>Latest: <a href="{{ (index .Releases 0).URL }}">{{ (index .Releases 0).Tag }}</a></p>
