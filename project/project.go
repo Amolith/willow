@@ -172,12 +172,19 @@ func Track(dbConn *sql.DB, mu *sync.Mutex, manualRefresh *chan struct{}, name, u
 }
 
 func Untrack(dbConn *sql.DB, mu *sync.Mutex, id string) {
-	err := db.DeleteProject(dbConn, mu, id)
+	proj, err := db.GetProject(dbConn, id)
+	if err != nil {
+		fmt.Println("Error getting project:", err)
+	}
+
+	err = db.DeleteProject(dbConn, mu, proj["id"])
 	if err != nil {
 		fmt.Println("Error deleting project:", err)
 	}
 
-	err = git.RemoveRepo(id)
+	// TODO: before removing, check whether other tracked projects use the same
+	// repo
+	err = git.RemoveRepo(proj["url"])
 	if err != nil {
 		log.Println(err)
 	}

@@ -34,7 +34,7 @@
                 {{- range . -}}
                 {{- if ne .Running (index .Releases 0).Tag -}}
                 <div id="{{ .ID }}" class="project card">
-                    <h3><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span class="delete"><a href="/new?action=delete&url={{ .URL }}">Delete?</a></span></h3>
+                    <h3><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span class="delete"><a href="/new?action=delete&id={{ .ID }}">Delete?</a></span></h3>
                     <p>You've selected {{ .Running }}. <a href="/new?action=update&url={{ .URL }}&forge={{ .Forge }}&name={{ .Name }}">Modify?</a></p>
                     <p>Latest: <a href="{{ (index .Releases 0).URL }}">{{ (index .Releases 0).Tag }}</a></p>
                     <p><a href="#{{ (index .Releases 0).ID }}">View release notes</a></p>
@@ -52,7 +52,7 @@
                 {{- range . -}}
                 {{- if eq .Running (index .Releases 0).Tag -}}
                 <div class="project card">
-                    <h3><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span class="delete"><a href="/new?action=delete&url={{ .URL }}">Delete?</a></span></h3>
+                    <h3><a href="{{ .URL }}">{{ .Name }}</a>&nbsp;&nbsp;&nbsp;<span class="delete"><a href="/new?action=delete&id={{ .ID }}">Delete?</a></span></h3>
                     <p>You've selected <a href="#{{ (index .Releases 0).ID }}">{{ .Running }}</a>. <a href="/new?action=update&url={{ .URL }}&forge={{ .Forge }}&name={{ .Name }}">Modify?</a></p>
                 </div>
                 {{- end -}}
