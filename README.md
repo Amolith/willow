@@ -14,39 +14,57 @@ _Forge-agnostic software release tracker_
 
 ![screenshot of willow's current web UI](.files/2024-02-24.png)
 
-_This UI is a minimal proof-of-concept, it's going to change drastically in the
-near future._
+_This UI is Amolith's attempt at something simple and functional, yet still
+friendly and pleasant. Amolith is not a UX professional and would **very** much
+welcome input from one!_
 
 ## What is it?
 
-_If you'd rather watch a video, I gave a [lightning talk on Willow] at the 2023
-Ubuntu Summit._
+_If you'd rather watch a short video, Amolith gave a 5-minute [lightning talk on
+Willow] at the 2023 Ubuntu Summit._
 
 [lightning talk on Willow]: https://youtu.be/XIGxKyekvBQ?t=29900
 
-Willow tracks software releases across arbitrary forge platforms by trying to
-support one of the very few things they all have in common: the VCS. At the
-moment, git is the _only_ supported VCS, but I would be interested in adding
-Pijul, Fossil, Mercurial, etc. You can also track releases using RSS feeds.
+**Willow** helps developers, sysadmins, and homelabbers keep up with software
+releases across arbitrary forge platforms, including full-featured forges like
+GitHub, GitLab, or [Forgejo] as well as more minimal options like cgit or
+[stagit].
 
-Willow exists because decentralisation can be annoying. One piece of software
-can be found on GitHub, another piece on GitLab, one on Bitbucket, a fourth on
-SourceHut, and a fifth on the developer's self-hosted Forgejo instance. Forgejo
-and GitHub have RSS feeds that only notify you of releases. GitLab doesn't
-support RSS feeds for anything, just an API you can poke. Some software updates
-might be on the developers' personal blog. Sometimes there are CVEs for specific
-software and they get published somewhere completely different before they're
-fixed in a release.
+[Forgejo]: https://forgejo.org/
+[cgit]: https://git.zx2c4.com/cgit/
+[stagit]: https://codemadness.org/stagit.html
 
-I want to bring all that scattered information under one roof so a developer or
-sysadmin can pop open willow's web UI and immediately see what needs updating
-where. I've recorded some of my other ideas and plans in [my wiki].
+**Willow** exists because decentralisation, as wonderful as it is, does have
+some pain points. One piece of software is on GitHub, another piece is on
+GitLab, one on Bitbucket, a fourth on [SourceHut], a fifth on the developer's
+self-hosted Forgejo instance. The capabilities of each platform can differ as
+well, making the problem even more difficult to solve. Forgejo and GitHub have
+RSS feeds that notify you of releases as well as APIs. SourceHut has firehose
+RSS feeds that notify you of _all_ activity in the repo plus an APIs. GitLab
+only has an API. Some release announcements might be on the developer's personal
+blog. Sometimes there's a CVE announcement prior to a release and those get
+published on a different platform entirely.
+
+[SourceHut]: https://sourcehut.org/
+
+**Willow** brings all that scattered information under one roof by supporting
+both RSS and one of the _very_ few things all the forges have in common: their
+**V**ersion **C**ontrol **S**ystem. At the moment, [Git] is the _only_ supported
+VCS, but we're definitely interested in adding support for Pijul, Fossil,
+Mercurial, and potentially others.
+
+[Git]: https://git-scm.com/
+[Pijul]: https://pijul.org/
+[Fossil]: https://www.fossil-scm.org/
+[Mercurial]: https://www.mercurial-scm.org/
+
+Amolith has recorded some of his other ideas, thoughts, and plans in [his wiki].
 
 [my wiki]: https://wiki.secluded.site/hypha/willow
 
 ## Installation and use
 
-_**Note:** prebuilt binaries will be available after I release [v0.0.1]_
+_**Note:** prebuilt binaries will be available after we release [v0.0.1]_
 
 [v0.0.1]: https://todo.sr.ht/~amolith/willow?search=status%3Aopen%20label%3A%22v0.0.1%22
 
@@ -64,7 +82,7 @@ _**Note:** prebuilt binaries will be available after I release [v0.0.1]_
 * Indicate which version you're currently on
 * That's it!
 
-Note that I still consider the project to be in _alpha_ state. There will be
+Note that we still consider the project to be in _alpha_ state. There _will_ be
 bugs; please help fix them!
 
 ## Contributing
@@ -73,13 +91,13 @@ Contributions are very much welcome! Please take a look at the [ticket
 tracker][todo] and see if there's anything you're interested in working on. If
 there's specific functionality you'd like to see implemented and it's not
 mentioned in the ticket tracker, please send a description to the [mailing
-list][email] so we can discuss its inclusion. If I don't feel like it fits with
-Willow's goals, you're encouraged to fork the project and make whatever changes
-you like!
+list][email] so we can discuss its inclusion. If we don't feel like it fits with
+**Willow's** goals, you're encouraged to fork the project and make whatever
+changes you like!
 
-Questions, comments, and patches can always be sent to the [mailing
-list][email], but I'm also in the [IRC channel][irc]/[XMPP room][xmpp] pretty
-much 24/7. I might not see messages right away, so please stick around.
+Questions, comments, and patches can always go to the [mailing list][email], but
+there's also an [IRC channel][irc] and an [XMPP MUC][xmpp] for real-time
+interactions.
 
 - Email: [~amolith/willow@lists.sr.ht][email]
 - IRC: [irc.libera.chat/#willow][irc]
