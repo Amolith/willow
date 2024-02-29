@@ -25,7 +25,7 @@ Willow] at the 2023 Ubuntu Summit._
 
 [lightning talk on Willow]: https://youtu.be/XIGxKyekvBQ?t=29900
 
-**Willow** helps developers, sysadmins, and homelabbers keep up with software
+Willow helps developers, sysadmins, and homelabbers keep up with software
 releases across arbitrary forge platforms, including full-featured forges like
 GitHub, GitLab, or [Forgejo] as well as more minimal options like cgit or
 [stagit].
@@ -34,21 +34,21 @@ GitHub, GitLab, or [Forgejo] as well as more minimal options like cgit or
 [cgit]: https://git.zx2c4.com/cgit/
 [stagit]: https://codemadness.org/stagit.html
 
-**Willow** exists because decentralisation, as wonderful as it is, does have
-some pain points. One piece of software is on GitHub, another piece is on
-GitLab, one on Bitbucket, a fourth on [SourceHut], a fifth on the developer's
-self-hosted Forgejo instance. The capabilities of each platform can differ as
-well, making the problem even more difficult to solve. Forgejo and GitHub have
-RSS feeds that notify you of releases as well as APIs. SourceHut has firehose
-RSS feeds that notify you of _all_ activity in the repo plus an APIs. GitLab
-only has an API. Some release announcements might be on the developer's personal
-blog. Sometimes there's a CVE announcement prior to a release and those get
-published on a different platform entirely.
+It exists because decentralisation, as wonderful as it is, does have some pain
+points. One piece of software is on GitHub, another piece is on GitLab, one on
+Bitbucket, a fourth on [SourceHut], a fifth on the developer's self-hosted
+Forgejo instance. The capabilities of each platform can differ as well, making
+the problem even more difficult to solve. Forgejo and GitHub have RSS feeds that
+notify you of releases as well as APIs. SourceHut has firehose RSS feeds that
+notify you of _all_ activity in the repo plus an APIs. GitLab only has an API.
+Some release announcements might be on the developer's personal blog. Sometimes
+there's a CVE announcement prior to a release and those get published on a
+different platform entirely.
 
 [SourceHut]: https://sourcehut.org/
 
-**Willow** brings all that scattered information under one roof by supporting
-both RSS and one of the _very_ few things all the forges have in common: their
+Willow brings all that scattered information under one roof by supporting both
+RSS and one of the _very_ few things all the forges have in common: their
 **V**ersion **C**ontrol **S**ystem. At the moment, [Git] is the _only_ supported
 VCS, but we're definitely interested in adding support for Pijul, Fossil,
 Mercurial, and potentially others.
@@ -92,8 +92,8 @@ tracker][todo] and see if there's anything you're interested in working on. If
 there's specific functionality you'd like to see implemented and it's not
 mentioned in the ticket tracker, please send a description to the [mailing
 list][email] so we can discuss its inclusion. If we don't feel like it fits with
-**Willow's** goals, you're encouraged to fork the project and make whatever
-changes you like!
+Willow's goals, you're encouraged to fork the project and make whatever changes
+you like!
 
 Questions, comments, and patches can always go to the [mailing list][email], but
 there's also an [IRC channel][irc] and an [XMPP MUC][xmpp] for real-time
