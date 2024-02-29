@@ -50,7 +50,7 @@ different platform entirely. It's a mess to keep up with.
 Willow brings some order to that mess by supporting both RSS and one of the
 _very_ few things all the forges have in common: their **V**ersion **C**ontrol
 **S**ystem. At the moment, [Git] is the _only_ supported VCS, but we're
-definitely interested in adding support for Pijul, Fossil, Mercurial, and
+definitely interested in adding support for [Pijul], [Fossil], [Mercurial], and
 potentially others.
 
 [Git]: https://git-scm.com/
@@ -60,7 +60,7 @@ potentially others.
 
 Amolith has recorded some of his other ideas, thoughts, and plans in [his wiki].
 
-[my wiki]: https://wiki.secluded.site/hypha/willow
+[his wiki]: https://wiki.secluded.site/hypha/willow
 
 ## Installation and use
 
