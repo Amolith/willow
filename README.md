@@ -27,7 +27,7 @@ Willow] at the 2023 Ubuntu Summit._
 
 Willow helps developers, sysadmins, and homelabbers keep up with software
 releases across arbitrary forge platforms, including full-featured forges like
-GitHub, GitLab, or [Forgejo] as well as more minimal options like cgit or
+GitHub, GitLab, or [Forgejo] as well as more minimal options like [cgit] or
 [stagit].
 
 [Forgejo]: https://forgejo.org/
