@@ -7,7 +7,6 @@ package git
 import (
 	"errors"
 	"fmt"
-	"io"
 	"net/url"
 	"os"
 	"strings"
@@ -149,42 +148,23 @@ func RemoveRepo(url string) (err error) {
 		return err
 	}
 
-	// TODO: Check whether the two parent directories are empty and remove them if
-	// so
-	for i := 0; i < 2; i++ {
-		path = strings.TrimSuffix(path, "/")
+	path = path[:strings.LastIndex(path, "/")]
+	dirs := strings.Split(path, "/")
+
+	for range dirs {
 		if path == "data" {
 			break
 		}
-		empty, err := dirEmpty(path)
+		err = os.Remove(path)
 		if err != nil {
-			return err
-		}
-		if empty {
-			err = os.Remove(path)
-			if err != nil {
-				return err
-			}
+			// This folder likely has data, so might as well save some time by
+			// not checking the parents we can't delete anyway.
+			break
 		}
 		path = path[:strings.LastIndex(path, "/")]
 	}
 
-	return err
-}
-
-// dirEmpty checks if a directory is empty.
-func dirEmpty(name string) (empty bool, err error) {
-	f, err := os.Open(name)
-	if err != nil {
-		return false, err
-	}
-	defer f.Close()
-
-	_, err = f.Readdirnames(1)
-	if err == io.EOF {
-		return true, nil
-	}
-	return false, err
+	return nil
 }
 
 // stringifyRepo accepts a repository URI string and the corresponding local
