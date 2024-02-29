@@ -90,8 +90,8 @@ bugs; please help fix them!
 Contributions are very much welcome! Please take a look at the [ticket
 tracker][todo] and see if there's anything you're interested in working on. If
 there's specific functionality you'd like to see implemented and it's not
-mentioned in the ticket tracker, please send a description to the [mailing
-list][email] so we can discuss its inclusion. If we don't feel like it fits with
+mentioned in the ticket tracker, please describe it through one of the platforms
+below so we can discuss its inclusion. If we don't feel like it fits with
 Willow's goals, you're encouraged to fork the project and make whatever changes
 you like!
 
