@@ -43,15 +43,15 @@ notify you of releases as well as APIs. SourceHut has both an API and firehose
 RSS feeds that notify you of _all_ activity in the repo. GitLab only has an API.
 Some release announcements might be on the developer's personal blog. Sometimes
 there's a CVE announcement prior to a release and those get published on a
-different platform entirely. This whole area is sprawling and scattered!
+different platform entirely. It's a mess to keep up with.
 
 [SourceHut]: https://sourcehut.org/
 
-Willow brings all that scattered information under one roof by supporting both
-RSS and one of the _very_ few things all the forges have in common: their
-**V**ersion **C**ontrol **S**ystem. At the moment, [Git] is the _only_ supported
-VCS, but we're definitely interested in adding support for Pijul, Fossil,
-Mercurial, and potentially others.
+Willow brings some order to that mess by supporting both RSS and one of the
+_very_ few things all the forges have in common: their **V**ersion **C**ontrol
+**S**ystem. At the moment, [Git] is the _only_ supported VCS, but we're
+definitely interested in adding support for Pijul, Fossil, Mercurial, and
+potentially others.
 
 [Git]: https://git-scm.com/
 [Pijul]: https://pijul.org/
