@@ -39,11 +39,11 @@ points. One piece of software is on GitHub, another piece is on GitLab, one on
 Bitbucket, a fourth on [SourceHut], a fifth on the developer's self-hosted
 Forgejo instance. The capabilities of each platform can differ as well, making
 the problem even more difficult to solve. Forgejo and GitHub have RSS feeds that
-notify you of releases as well as APIs. SourceHut has firehose RSS feeds that
-notify you of _all_ activity in the repo plus an APIs. GitLab only has an API.
+notify you of releases as well as APIs. SourceHut has both an API and firehose
+RSS feeds that notify you of _all_ activity in the repo. GitLab only has an API.
 Some release announcements might be on the developer's personal blog. Sometimes
 there's a CVE announcement prior to a release and those get published on a
-different platform entirely.
+different platform entirely. This whole area is sprawling and scattered!
 
 [SourceHut]: https://sourcehut.org/
 
