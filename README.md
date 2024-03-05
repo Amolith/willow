@@ -89,25 +89,25 @@ in [his wiki].
 
 This assumes Willow will run on an always-on server, like a VPS.
 
-* Clone the repo with `git clone https://git.sr.ht/~amolith/willow`.
-* Enter the repo's folder with `cd willow`.
+* Clone the repo with `git clone https://git.sr.ht/~amolith/willow`
+* Enter the repo's folder with `cd willow`
 * Build the binary with `CGO_ENABLED=0 go build -ldflags="-s -w" -o willow
-  ./cmd`.
-* Transfer the binary to the server however you like.
-* Execute the binary with `./willow`.
-* Edit the config with `vim config.toml`.
-* Daemonise Willow using systemd or OpenRC or whatever you prefer.
+  ./cmd`
+* Transfer the binary to the server however you like
+* Execute the binary with `./willow`
+* Edit the config with `vim config.toml`
+* Daemonise Willow using systemd or OpenRC or whatever you prefer
 * Reverse-proxy the web UI (defaults to `localhost:1313`) with Caddy or NGINX or
-  whatever you prefer.
+  whatever you prefer
 
 ### Use
 
-* Create a user with `./willow -a <username>`.
+* Create a user with `./willow -a <username>`
 * Open the web UI (defaults to `localhost:1313`, but [installation] had you put
-  a proxy in front).
-* Click `Track new project`.
-* Fill out the form and press `Next`.
-* Indicate which version you're currently on and press `Track releases`.
+  a proxy in front)
+* Click `Track new project`
+* Fill out the form and press `Next`
+* Indicate which version you're currently on and press `Track releases`
 * You're now tracking that project's releases!
 
 [installation]: #installation
