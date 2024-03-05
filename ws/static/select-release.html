@@ -44,7 +44,7 @@
             <input type="hidden" name="name" value="{{ .Name }}">
             <input type="hidden" name="forge" value="{{ .Forge }}">
             <input type="hidden" name="id" value="{{ .ID }}">
-            <input class="button" type="submit" formaction="/new" value="Track future releases">
+            <input class="button" type="submit" formaction="/new" value="Track releases">
         </form>
         <!-- Append these if they ever start limiting RSS entries: `(eq $forge "gitea") (eq $forge "forgejo")` -->
         {{- if or (eq $forge "github") -}}
