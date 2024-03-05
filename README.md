@@ -14,9 +14,9 @@ _Forge-agnostic software release tracker_
 
 ![screenshot of willow's current web UI](.files/2024-02-24.png)
 
-_This UI is Amolith's attempt at something simple and functional, yet still
-friendly and pleasant. Amolith is not a UX professional and would **very** much
-welcome input from one!_
+_This UI is Amolith's attempt at a balance between simple, pleasant, and
+functional. Amolith is not a UX professional and would **very** much welcome
+input from someone more knowledgeable!_
 
 ## What is it?
 
@@ -37,18 +37,26 @@ GitHub, GitLab, or [Forgejo] as well as more minimal options like [cgit] or
 It exists because decentralisation, as wonderful as it is, does have some pain
 points. One piece of software is on GitHub, another piece is on GitLab, one on
 Bitbucket, a fourth on [SourceHut], a fifth on the developer's self-hosted
-Forgejo instance. The capabilities of each platform can differ as well, making
-the problem even more difficult to solve. Forgejo and GitHub have RSS feeds that
-notify you of releases as well as APIs. SourceHut has both an API and firehose
-RSS feeds that notify you of _all_ activity in the repo. GitLab only has an API.
-Some release announcements might be on the developer's personal blog. Sometimes
-there's a CVE announcement prior to a release and those get published on a
-different platform entirely. It's a mess to keep up with.
+Forgejo instance.
 
 [SourceHut]: https://sourcehut.org/
 
-Willow brings some order to that mess by supporting both RSS and one of the
-_very_ few things all the forges have in common: their **V**ersion **C**ontrol
+The capabilities of each platform can also differ, further complicating the
+space. For example, Forgejo and GitHub have APIs and RSS release feeds,
+SourceHut has an API and RSS feeds that notify you of _all_ activity in the
+repo, GitLab only has an API, and there's no standard for discovering the
+capabilities of arbitrary git frontends like [legit].
+
+[legit]: https://github.com/icyphox/legit
+
+And _then_ you have different pieces of information in different places; some
+developers might publish release announcements on their personal blog and some
+projects might release security advisories on an external platform prior to
+publishing a release.
+
+All this important info is scattered all over the internet. Willow brings some
+order to that chaos by supporting both RSS and one of the _very_ few things all
+the forges and frontends have in common: their **V**ersion **C**ontrol
 **S**ystem. At the moment, [Git] is the _only_ supported VCS, but we're
 definitely interested in adding support for [Pijul], [Fossil], [Mercurial], and
 potentially others.
@@ -58,32 +66,66 @@ potentially others.
 [Fossil]: https://www.fossil-scm.org/
 [Mercurial]: https://www.mercurial-scm.org/
 
-Amolith has recorded some of his other ideas, thoughts, and plans in [his wiki].
+Amolith (the creator) has recorded some of his other ideas, thoughts, and plans
+in [his wiki].
 
 [his wiki]: https://wiki.secluded.site/hypha/willow
 
 ## Installation and use
 
-_**Note:** prebuilt binaries will be available after we release [v0.0.1]_
+**Disclaimers:** 
+1. Prebuilt binaries will be available with the [v0.0.1] release, greatly
+   simplifying installation.
+2. We consider the project _alpha-quality_. There will be bugs.
+3. Amolith has tried to make the web UI accessible, but is unsure of its current
+   usability.
+4. The app is not localised yet and English is the only available language.
+5. Help with any/all of the above is most welcome!
 
 [v0.0.1]: https://todo.sr.ht/~amolith/willow?search=status%3Aopen%20label%3A%22v0.0.1%22
+[communication platforms]: #contributing
 
-* Clone the repo
-* Build the binary with `CGO_ENABLED=0 go build -ldflags="-s -w" -o willow ./cmd`
-* Upload it to a remote server
-* Execute the binary
-* Edit the `config.toml`
-* Create a user with `./willow -a <username>`
-* Execute the binary again
-* Reverse proxy `http://localhost:1313`
-* Open the web UI
-* Click `Track new project`
-* Fill out the form
-* Indicate which version you're currently on
-* That's it!
+### Installation
 
-Note that we still consider the project to be in _alpha_ state. There _will_ be
-bugs; please help fix them!
+This assumes Willow will run on an always-on server, like a VPS.
+
+* Clone the repo with `git clone https://git.sr.ht/~amolith/willow`.
+* Enter the repo's folder with `cd willow`.
+* Build the binary with `CGO_ENABLED=0 go build -ldflags="-s -w" -o willow
+  ./cmd`.
+* Transfer the binary to the server however you like.
+* Execute the binary with `./willow`.
+* Edit the config with `vim config.toml`.
+* Daemonise Willow using systemd or OpenRC or whatever you prefer.
+* Reverse-proxy the web UI (defaults to `localhost:1313`) with Caddy or NGINX or
+  whatever you prefer.
+
+### Use
+
+* Create a user with `./willow -a <username>`.
+* Open the web UI (defaults to `localhost:1313`, but [installation] had you put
+  a proxy in front).
+* Click `Track new project`.
+* Fill out the form and press `Next`.
+* Indicate which version you're currently on and press `Track releases`.
+* You're now tracking that project's releases!
+
+[installation]: #installation
+
+If you no longer use that project, click the `Delete?` link to remove it, and,
+if applicable, Willow's copy of its repo.
+
+If you're no longer running the version Willow says you've selected, click the
+`Modify?` link to select a different version.
+
+If there are projects where your selected version does _not_ match what Willow
+thinks is latest, they'll show up at the top under the **Outdated projects**
+heading and have a link at the bottom of the card to `View release notes`.
+Clicking that link populates the right column with those release notes.
+
+If there are projects where your selected version _does_ match what Willow
+thinks is latest, they'll show up at the bottom under the **Up-to-date
+projects** heading.
 
 ## Contributing
 
