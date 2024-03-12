@@ -29,6 +29,12 @@ type Handler struct {
 	Mu            *sync.Mutex
 }
 
+type page struct {
+	Projects    []project.Project
+	Message     string
+	MessageType string
+}
+
 //go:embed static
 var fs embed.FS
 
@@ -51,7 +57,12 @@ func (h Handler) RootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tmpl := template.Must(template.ParseFS(fs, "static/home.html"))
-	if err := tmpl.Execute(w, data); err != nil {
+	p := page{
+		Projects:    data,
+		Message:     "Hello world",
+		MessageType: "info",
+	}
+	if err := tmpl.Execute(w, p); err != nil {
 		fmt.Println(err)
 	}
 }
