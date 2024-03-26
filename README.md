@@ -132,10 +132,47 @@ projects** heading.
 Contributions are very much welcome! Please take a look at the [ticket
 tracker][todo] and see if there's anything you're interested in working on. If
 there's specific functionality you'd like to see implemented and it's not
-mentioned in the ticket tracker, please describe it through one of the platforms
-below so we can discuss its inclusion. If we don't feel like it fits with
-Willow's goals, you're encouraged to fork the project and make whatever changes
-you like!
+mentioned in the ticket tracker, please describe it through one of [the
+communication platforms](#communication) below so we can discuss its inclusion.
+If we don't feel like it fits with Willow's goals, you're encouraged to fork the
+project and make whatever changes you like!
+
+### Collaboration
+
+Some people dislike GitHub, some people dislike SourceHut, and some people
+dislike both. Collaboration happens on multiple platforms so anyone can
+contribute to Willow however they like. Any of the following suitable, but
+they're listed in order of Amolith's preference:
+
+- [SourceHut]
+  - **Distributed:** contributions are either through [git send-email], which
+    requires you to have SMTP access to an email address, or through SourceHut's
+    web UI, which requires a SourceHut account.
+  - **Open source:** SourceHut components are licenced under AGPL, BSD, and
+    possibly others.
+- [Radicle]
+  - **Distributed:** contributions are through the [Heartwood protocol], which
+    requires you to at least set up a local Radicle node.
+  - **Open source:** Radicle components are licenced under Apache, MIT, GPL, and
+    possibly others.
+- [Codeberg]
+  - **Centralised:** contributions are through Codeberg pull requests and
+    require a Codeberg account.
+  - **Open source:** Codeberg is powered by Forgejo, which is licensed under MIT.
+- [GitHub]
+  - **Centralised:** contributions are through GitHub pull requests and require
+    a GitHub account.
+  - **Mixed:** _components_ of GitHub are open source, such as the syntax
+    highlighter, but everything that makes GitHub _useful_ is proprietary.
+
+[SourceHut]: https://sr.ht/~amolith/willow
+[git send-email]: https://git-send-email.io
+[Radicle]: https://app.radicle.xyz/nodes/radicle.secluded.site/rad:z34saeE8jnN5KbGRuLSggJ3eeLtew
+[Heartwood protocol]: https://radicle.xyz/guides/protocol
+[Codeberg]: https://codeberg.org/Amolith/willow
+[GitHub]: https://github.com/Amolith/willow
+
+### Communication
 
 Questions, comments, and patches can always go to the [mailing list][email], but
 there's also an [IRC channel][irc] and an [XMPP MUC][xmpp] for real-time
