@@ -141,7 +141,7 @@ project and make whatever changes you like!
 
 Some people dislike GitHub, some people dislike SourceHut, and some people
 dislike both. Collaboration happens on multiple platforms so anyone can
-contribute to Willow however they like. Any of the following suitable, but
+contribute to Willow however they like. Any of the following are suitable, but
 they're listed in order of Amolith's preference:
 
 - [SourceHut]
