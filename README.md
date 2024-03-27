@@ -166,7 +166,7 @@ they're listed in order of Amolith's preference:
 
 [SourceHut]: https://sr.ht/~amolith/willow
 [git send-email]: https://git-send-email.io
-[Radicle]: https://app.radicle.xyz/nodes/radicle.secluded.site/rad:z34saeE8jnN5KbGRuLSggJ3eeLtew
+[Radicle]: https://radicle.secluded.site/nodes/seed.secluded.site/rad:z34saeE8jnN5KbGRuLSggJ3eeLtew
 [Heartwood protocol]: https://radicle.xyz/guides/protocol
 [Codeberg]: https://codeberg.org/Amolith/willow
 [GitHub]: https://github.com/Amolith/willow
